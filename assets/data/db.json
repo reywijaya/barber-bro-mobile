@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "id": "iji234",
+      "name": "John Doe",
+      "gender": "male",
+      "phone": "1234567890",
+      "address": "123 Main St, Anytown USA",
+      "email": "user@example.com",
+      "password": "password"
+    },
+    {
+      "id": "9aed",
+      "name": "Aditya Bayu Prabowo",
+      "gender": "male",
+      "phone": "088227661015",
+      "address": "Jalan Topaz Number 7",
+      "email": "Aditya@gmail.com",
+      "password": "1234567890"
+    },
+    {
+      "id": "615b",
+      "name": "Aditya",
+      "gender": "male",
+      "phone": "088227661015",
+      "address": "Jalan topaz",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12."
+    },
+    {
+      "id": "3d8e",
+      "name": "Aditya Bayu Prabowo",
+      "gender": "male",
+      "phone": "088227661015",
+      "address": "Jalan topaz no 7",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12."
+    }
+  ]
+}
