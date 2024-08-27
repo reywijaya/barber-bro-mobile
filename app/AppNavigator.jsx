@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {ActivityIndicator, Text, View} from "react-native";
 import HomeScreen from "./screens/HomeScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,12 +49,13 @@ const AppNavigator = () => {
 
     return (
         <Stack.Navigator
-            initialRouteName={user.loggedInUser?.id ? "Tab" : "Login"}
+            initialRouteName={user.loggedInUser ? "Tab" : "Login"}
             screenOptions={{headerShown: false}}
         >
             <Stack.Screen name="Home" component={HomeScreen}/>
             <Stack.Screen name="Register" component={RegisterScreen}/>
             <Stack.Screen name="Login" component={LoginScreen}/>
+            <Stack.Screen name="Profile" component={ProfileScreen}/>
             <Stack.Screen name="Tab" component={TabNavigator}/>
         </Stack.Navigator>
     );

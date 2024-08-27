@@ -94,6 +94,26 @@
       "id": "caa7",
       "email": "Aditya@gmail.com",
       "password": "Cilacap12"
+    },
+    {
+      "id": "a2da",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12"
+    },
+    {
+      "id": "ee41",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12"
+    },
+    {
+      "id": "965d",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12"
+    },
+    {
+      "id": "6750",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12"
     }
   ],
   "barbershop": [
@@ -265,6 +285,14 @@
       "description": "Custom hair styling to suit your look.",
       "price_range": "$30 - $50",
       "id": "e5f6"
+    },
+    {
+      "service_id": 8,
+      "barbershop_id": 6,
+      "service_name": "Haircut",
+      "description": "Classic haircuts for men and women.",
+      "price_range": "$15 - $25",
+      "id": "f7g8"
     }
   ],
   "facility": [
