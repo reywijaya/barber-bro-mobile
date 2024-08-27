@@ -1,5 +1,5 @@
 {
-  "users": [
+  "login": [
     {
       "id": "iji234",
       "name": "John Doe",
@@ -44,6 +44,322 @@
       "address": "Jl. Topaz",
       "email": "rey@gmail.com",
       "password": "R3r3dotcom$"
+    },
+    {
+      "id": "7977",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12."
+    },
+    {
+      "id": "a0d6",
+      "email": "Aditya@gmail.com",
+      "password": "1234567890"
+    },
+    {
+      "id": "047d",
+      "email": "Aditya@gmail.com",
+      "password": "1234567890"
+    },
+    {
+      "id": "5e35",
+      "email": "Aditya@gmail.com",
+      "password": "1234567890"
+    },
+    {
+      "id": "7ac0",
+      "email": "Aditya@gmail.com",
+      "password": "1234567890"
+    },
+    {
+      "id": "53b2",
+      "email": "Aditya@gmail.com",
+      "password": "1234567890"
+    },
+    {
+      "id": "ab67",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12"
+    },
+    {
+      "id": "9536",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12"
+    },
+    {
+      "id": "651d",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12"
+    },
+    {
+      "id": "caa7",
+      "email": "Aditya@gmail.com",
+      "password": "Cilacap12"
+    }
+  ],
+  "barbershop": [
+    {
+      "barbershop_id": 2,
+      "name": "Classic Cuts",
+      "contact_number": "+987654321",
+      "email": "contact@classiccuts.com",
+      "street_address": "456 Elm St",
+      "city": "New York",
+      "state_province_region": "NY",
+      "postal_zip_code": "10001",
+      "country": "USA",
+      "latitude": 40.712776,
+      "longitude": -74.005974,
+      "description": "A classic barbershop with a vintage touch.",
+      "logo_url": "https://via.placeholder.com/150/FF0000/FFFFFF?text=Logo2",
+      "promotional_video_url": "https://example.com/classiccuts_promo.mp4",
+      "id": "7700"
+    },
+    {
+      "barbershop_id": 3,
+      "name": "Groom & Shave",
+      "contact_number": "+1122334455",
+      "email": "info@groomshave.com",
+      "street_address": "789 Pine St",
+      "city": "San Francisco",
+      "state_province_region": "CA",
+      "postal_zip_code": "94103",
+      "country": "USA",
+      "latitude": 37.774929,
+      "longitude": -122.419418,
+      "description": "A premium grooming experience for modern men.",
+      "logo_url": "https://via.placeholder.com/150/00FF00/FFFFFF?text=Logo3",
+      "promotional_video_url": "https://example.com/groomshave_promo.mp4",
+      "id": "8801"
+    },
+    {
+      "barbershop_id": 4,
+      "name": "The Gentleman's Den",
+      "contact_number": "+2233445566",
+      "email": "info@gentlemansden.com",
+      "street_address": "321 Oak St",
+      "city": "Chicago",
+      "state_province_region": "IL",
+      "postal_zip_code": "60614",
+      "country": "USA",
+      "latitude": 41.878113,
+      "longitude": -87.629799,
+      "description": "An upscale barbershop offering a range of services.",
+      "logo_url": "https://via.placeholder.com/150/FFFF00/000000?text=Logo4",
+      "promotional_video_url": "https://example.com/gentlemansden_promo.mp4",
+      "id": "9902"
+    },
+    {
+      "barbershop_id": 5,
+      "name": "Metro Hair Lounge",
+      "contact_number": "+3344556677",
+      "email": "contact@metrohairlounge.com",
+      "street_address": "654 Maple St",
+      "city": "Seattle",
+      "state_province_region": "WA",
+      "postal_zip_code": "98101",
+      "country": "USA",
+      "latitude": 47.606209,
+      "longitude": -122.332069,
+      "description": "A modern lounge with a focus on style and comfort.",
+      "logo_url": "https://via.placeholder.com/150/00FFFF/000000?text=Logo5",
+      "promotional_video_url": "https://example.com/metrohairlounge_promo.mp4",
+      "id": "10003"
+    },
+    {
+      "barbershop_id": 6,
+      "name": "Elite Grooming",
+      "contact_number": "+4455667788",
+      "email": "info@elitegrooming.com",
+      "street_address": "987 Birch St",
+      "city": "Austin",
+      "state_province_region": "TX",
+      "postal_zip_code": "73301",
+      "country": "USA",
+      "latitude": 30.267153,
+      "longitude": -97.743057,
+      "description": "Top-notch grooming services for the discerning client.",
+      "logo_url": "https://via.placeholder.com/150/FF00FF/000000?text=Logo6",
+      "promotional_video_url": "https://example.com/elitegrooming_promo.mp4",
+      "id": "11004"
+    }
+  ],
+  "operating_hours": [
+    {
+      "operating_hours_id": 3,
+      "barbershop_id": 2,
+      "day_of_week": "Wednesday",
+      "opening_time": "10:00",
+      "closing_time": "19:00",
+      "id": "f5d2"
+    },
+    {
+      "operating_hours_id": 4,
+      "barbershop_id": 2,
+      "day_of_week": "Thursday",
+      "opening_time": "10:00",
+      "closing_time": "19:00",
+      "id": "c8b7"
+    },
+    {
+      "operating_hours_id": 5,
+      "barbershop_id": 3,
+      "day_of_week": "Friday",
+      "opening_time": "08:00",
+      "closing_time": "17:00",
+      "id": "d1a8"
+    },
+    {
+      "operating_hours_id": 6,
+      "barbershop_id": 3,
+      "day_of_week": "Saturday",
+      "opening_time": "08:00",
+      "closing_time": "16:00",
+      "id": "e3c9"
+    },
+    {
+      "operating_hours_id": 7,
+      "barbershop_id": 4,
+      "day_of_week": "Sunday",
+      "opening_time": "10:00",
+      "closing_time": "15:00",
+      "id": "a4d5"
+    }
+  ],
+  "service": [
+    {
+      "service_id": 3,
+      "barbershop_id": 2,
+      "service_name": "Beard Trim",
+      "description": "Expert beard trimming and shaping.",
+      "price_range": "$10 - $20",
+      "id": "a6b7"
+    },
+    {
+      "service_id": 4,
+      "barbershop_id": 2,
+      "service_name": "Scalp Massage",
+      "description": "Relaxing scalp massage with essential oils.",
+      "price_range": "$25 - $35",
+      "id": "b8c9"
+    },
+    {
+      "service_id": 5,
+      "barbershop_id": 3,
+      "service_name": "Hot Towel Shave",
+      "description": "Luxurious hot towel shave experience.",
+      "price_range": "$30 - $40",
+      "id": "c1d2"
+    },
+    {
+      "service_id": 6,
+      "barbershop_id": 4,
+      "service_name": "Coloring",
+      "description": "Hair coloring with premium dyes.",
+      "price_range": "$50 - $70",
+      "id": "d3e4"
+    },
+    {
+      "service_id": 7,
+      "barbershop_id": 5,
+      "service_name": "Hair Styling",
+      "description": "Custom hair styling to suit your look.",
+      "price_range": "$30 - $50",
+      "id": "e5f6"
+    }
+  ],
+  "facility": [
+    {
+      "facility_id": 3,
+      "facility_name": "Restroom",
+      "id": "b8c9"
+    },
+    {
+      "facility_id": 4,
+      "facility_name": "Coffee Bar",
+      "id": "d1e2"
+    }
+  ],
+  "barbershop_facility": [
+    {
+      "barbershop_facility_id": 3,
+      "barbershop_id": 2,
+      "facility_id": 3,
+      "id": "e2f3"
+    },
+    {
+      "barbershop_facility_id": 4,
+      "barbershop_id": 2,
+      "facility_id": 4,
+      "id": "f3g4"
+    },
+    {
+      "barbershop_facility_id": 5,
+      "barbershop_id": 4,
+      "facility_id": 3,
+      "id": "g4h5"
+    }
+  ],
+  "social_media": [
+    {
+      "social_media_id": 3,
+      "barbershop_id": 2,
+      "platform_name": "Twitter",
+      "platform_url": "https://twitter.com/classiccuts",
+      "id": "d1e3"
+    },
+    {
+      "social_media_id": 4,
+      "barbershop_id": 3,
+      "platform_name": "YouTube",
+      "platform_url": "https://youtube.com/groomshave",
+      "id": "e2f4"
+    },
+    {
+      "social_media_id": 5,
+      "barbershop_id": 4,
+      "platform_name": "LinkedIn",
+      "platform_url": "https://linkedin.com/company/thegentlemansden",
+      "id": "f3g5"
+    }
+  ],
+  "gallery_image": [
+    {
+      "image_id": 3,
+      "barbershop_id": 2,
+      "image_url": "https://example.com/classiccuts_image1.jpg",
+      "id": "f6g7"
+    },
+    {
+      "image_id": 4,
+      "barbershop_id": 3,
+      "image_url": "https://example.com/groomshave_image1.jpg",
+      "id": "g8h9"
+    },
+    {
+      "image_id": 5,
+      "barbershop_id": 4,
+      "image_url": "https://example.com/gentlemansden_image1.jpg",
+      "id": "h1i2"
+    }
+  ],
+  "promotion": [
+    {
+      "promotion_id": 2,
+      "barbershop_id": 2,
+      "promotion_description": "15% off on all services every Tuesday.",
+      "id": "f4g5"
+    },
+    {
+      "promotion_id": 3,
+      "barbershop_id": 3,
+      "promotion_description": "Free beard trim with any haircut on weekends.",
+      "id": "g6h7"
+    },
+    {
+      "promotion_id": 4,
+      "barbershop_id": 4,
+      "promotion_description": "20% off on color services this month.",
+      "id": "h8i9"
     }
   ]
 }

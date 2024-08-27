@@ -32,7 +32,6 @@ export const LoginScreen = ({navigation}) => {
             setError("Password must be at least 8 characters long");
             return;
         }
-
         try {
             const response = await axiosInstance.post(`/login`, {
                 email,
