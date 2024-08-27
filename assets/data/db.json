@@ -35,6 +35,15 @@
       "address": "Jalan topaz no 7",
       "email": "Aditya@gmail.com",
       "password": "Cilacap12."
+    },
+    {
+      "id": "100b",
+      "name": "Rey",
+      "gender": "male",
+      "phone": "085156906167",
+      "address": "Jl. Topaz",
+      "email": "rey@gmail.com",
+      "password": "R3r3dotcom$"
     }
   ]
 }

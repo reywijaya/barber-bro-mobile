@@ -8,37 +8,46 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Alert,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RadioGroup from "react-native-radio-buttons-group";
 import axiosInstance from "../service/axios";
-import { useNavigation } from "@react-navigation/native";
 
-export default function RegisterScreen() {
-  const [name, setName] = useState("");
-  const [gender, setGender] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+export default function RegisterScreen({ navigation }) {
+  // const [name, setName] = useState("");
+  // const [gender, setGender] = useState("");
+  // const [phone, setPhone] = useState("");
+  // const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedGender, setSelectedGender] = useState(null);
-  const navigation = useNavigation();
+  const role="CUSTOMER";
+  // const [selectedGender, setSelectedGender] = useState(null);
 
   const handleSubmit = async () => {
-    if (!name || !gender || !phone || !address || !email || !password || !confirmPassword) {
+    if (
+      //!name ||
+      // !gender ||
+      // !phone ||
+      // !address ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
       Alert.alert("Error", "All fields are required.");
       return;
     }
-    if (!/^\d{10,13}$/.test(phone)) {
-      Alert.alert("Error", "Phone number must be between 10 and 13 digits.");
-      return;
-    }
+    // if (!/^\d{10,13}$/.test(phone)) {
+    //   Alert.alert("Error", "Phone number must be between 10 and 13 digits.");
+    //   return;
+    // }
     if (!/\S+@\S+\.\S+/.test(email)) {
       Alert.alert("Error", "Please enter a valid email address.");
       return;
     }
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
     if (!passwordRegex.test(password)) {
       Alert.alert(
         "Error",
@@ -52,17 +61,18 @@ export default function RegisterScreen() {
     }
 
     const data = {
-      name,
-      gender,
-      phone,
-      address,
+      // name,
+      // gender,
+      // phone,
+      // address,
       email,
       password,
+      role
     };
 
     try {
-      const response = await axiosInstance.post("/users", data);
-      console.log(response.data);
+      const response = await axiosInstance.post("/register", data);
+      // console.log(response.data);
       Alert.alert("Success", "Registration Successful!");
       navigation.navigate("Login");
     } catch (error) {
@@ -77,18 +87,18 @@ export default function RegisterScreen() {
         id: "male",
         label: "Male",
         value: "male",
-        color: "#2196F3",
-        selectedColor: "#2196F3",
-        unselectedColor: "#1B1A17",
+        color: "white",
+        selectedColor: "white",
+        unselectedColor: "white",
         labelStyle: { color: "white" },
       },
       {
         id: "female",
         label: "Female",
         value: "female",
-        color: "#FF69B4",
-        selectedColor: "#FF69B4",
-        unselectedColor: "#1B1A17",
+        color: "white",
+        selectedColor: "white",
+        unselectedColor: "white",
         labelStyle: { color: "white" },
       },
     ],
@@ -101,73 +111,82 @@ export default function RegisterScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView behavior="padding" style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollView}>
-          <Text style={styles.title}>Register</Text>
-          <View style={styles.form}>
-            <Text style={styles.label}>Name</Text>
-            <TextInput
-              placeholder="Name"
-              placeholderTextColor="#aaa"
-              value={name}
-              onChangeText={(text) => setName(text)}
-              style={styles.input}
-            />
-            <Text style={styles.label}>Gender</Text>
-            <RadioGroup
-              layout="row"
-              radioButtons={radioButtons}
-              onPress={handleGenderChange}
-              selectedId={selectedGender}
-              containerStyle={styles.radioGroup}
-            />
-            <Text style={styles.label}>Phone</Text>
-            <TextInput
-              placeholder="Phone"
-              placeholderTextColor="#aaa"
-              value={phone}
-              onChangeText={(text) => setPhone(text)}
-              style={styles.input}
-              keyboardType="phone-pad"
-            />
-            <Text style={styles.label}>Address</Text>
-            <TextInput
-              placeholder="Address"
-              placeholderTextColor="#aaa"
-              value={address}
-              onChangeText={(text) => setAddress(text)}
-              style={styles.input}
-            />
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              placeholder="Email"
-              placeholderTextColor="#aaa"
-              value={email}
-              onChangeText={(text) => setEmail(text)}
-              style={styles.input}
-              keyboardType="email-address"
-            />
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              placeholder="Password"
-              placeholderTextColor="#aaa"
-              value={password}
-              onChangeText={(text) => setPassword(text)}
-              secureTextEntry
-              style={styles.input}
-            />
-            <Text style={styles.label}>Confirm Password</Text>
+    <SafeAreaView className="flex-1 bg-black">
+      <KeyboardAvoidingView behavior="padding" className="flex-1">
+        <ScrollView className="flex-1">
+          <Text className="text-white font-bold text-3xl p-4">Register</Text>
+          <View className="flex-1 p-4">
+            {/* 
+            <View className="mb-4">
+              <TextInput
+                placeholder="Name"
+                placeholderTextColor="#6b7280"
+                value={name}
+                onChangeText={(text) => setName(text)}
+                className="bg-gray-700 p-3 rounded text-white text-lg"
+              />
+            </View>
+            <View className="mb-4">
+              <RadioGroup
+                layout="row"
+                radioButtons={radioButtons}
+                onPress={handleGenderChange}
+                selectedId={selectedGender}
+                className="flex-row"
+              />
+            </View>
+            <View className="mb-4">
+              <TextInput
+                placeholder="Phone"
+                placeholderTextColor="#6b7280"
+                value={phone}
+                onChangeText={(text) => setPhone(text)}
+                className="bg-gray-700 p-3 rounded text-white text-lg"
+                keyboardType="phone-pad"
+              />
+            </View>
+            <View className="mb-4">
+              <TextInput
+                placeholder="Address"
+                placeholderTextColor="#6b7280"
+                value={address}
+                onChangeText={(text) => setAddress(text)}
+                className="bg-gray-700 p-3 rounded text-white text-lg"
+              />
+            </View> */}
+            <View className="mb-4">
+              <TextInput
+                placeholder="Email"
+                placeholderTextColor="#6b7280"
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+                className="bg-gray-700 p-3 rounded text-white text-lg"
+                keyboardType="email-address"
+              />
+            </View>
+            <View className="mb-4">
+              <TextInput
+                placeholder="Password"
+                placeholderTextColor="#6b7280"
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+                secureTextEntry
+                className="bg-gray-700 p-3 rounded text-white text-lg"
+              />
+            </View>
             <TextInput
               placeholder="Confirm Password"
-              placeholderTextColor="#aaa"
+              placeholderTextColor="#6b7280"
               value={confirmPassword}
               onChangeText={(text) => setConfirmPassword(text)}
               secureTextEntry
-              style={styles.input}
+              className="bg-gray-700 p-3 rounded text-white text-lg"
             />
-            <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-              <Text style={styles.buttonText}>Submit</Text>
+            <TouchableOpacity
+              onPress={handleSubmit}
+              className="bg-white p-3 rounded mt-4"
+            >
+              <Text className="font-bold text-lg text-center">Sign Up</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -175,56 +194,3 @@ export default function RegisterScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#1B1A17",
-  },
-  scrollView: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
-  },
-  title: {
-    fontSize: 24,
-    marginVertical: 24,
-    textAlign: "center",
-    color: "white",
-  },
-  form: {
-    width: "100%",
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: "white",
-  },
-  input: {
-    height: 40,
-    borderColor: "#444",
-    borderWidth: 1,
-    marginBottom: 16,
-    paddingHorizontal: 8,
-    borderRadius: 4,
-    color: "white",
-    backgroundColor: "#333",
-  },
-  radioGroup: {
-    marginBottom: 16,
-  },
-  button: {
-    marginTop: 24,
-    backgroundColor: "white",
-    paddingVertical: 12,
-    borderRadius: 4,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "black",
-    fontSize: 16,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-});
-
-
