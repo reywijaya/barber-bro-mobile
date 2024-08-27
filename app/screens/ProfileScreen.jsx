@@ -61,14 +61,18 @@ export default function ProfileScreen() {
                         </View>
                     </View>
                     <View className="h-[1px] bg-gray-700 my-2"/>
-                    <View className="flex-row items-center justify-between">
-                        <View className="flex-row items-center gap-2">
-                            <Ionicons name='heart-outline' size={24} color="#9ca3af"/>
-                            <Text className="text-gray-400 text-lg py-2">Liked Barbershop</Text>
-                        </View>
-                        <View>
-                            <Feather name='arrow-right' size={24} color="#9ca3af"/>
-                        </View>
+                    <View>
+                        <TouchableOpacity className="flex-row items-center justify-between"
+                                          onPress={() => navigation.navigate('Barbershop')}
+                        >
+                            <View className="flex-row items-center gap-2">
+                                <Ionicons name='heart-outline' size={24} color="#9ca3af"/>
+                                <Text className="text-gray-400 text-lg py-2">Liked Barbershop</Text>
+                            </View>
+                            <View>
+                                <Feather name='arrow-right' size={24} color="#9ca3af"/>
+                            </View>
+                        </TouchableOpacity>
                     </View>
                     <View className="flex-row items-center justify-between">
                         <View className="flex-row items-center gap-2">

@@ -37,8 +37,8 @@ export const LoginScreen = ({navigation}) => {
                 email,
                 password,
             });
-            console.log("response : ", response.data.data);
-            if (!response.data.data) {
+            console.log("response : ", response.data);
+            if (!response.data) {
                 setError("Email or password invalid");
                 return;
             }
