@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function ProfileScreen() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.loggedInUser.loggedInUser.data);
+  const user = useSelector((state) => state.loggedInUser.loggedInUser);
   console.log("user : ", user);
 
   const handleLogout = async () => {

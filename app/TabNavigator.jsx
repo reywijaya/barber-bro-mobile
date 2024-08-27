@@ -26,7 +26,7 @@ const TabNavigator = () => {
                 component={AppointmentScreen}
                 options={{
                     tabBarIcon: () => (
-                        <Ionicons name="search-outline" size={20} color="black"/>
+                        <Ionicons name="calendar-outline" size={20} color="black"/>
                     ),
                 }}
             />
