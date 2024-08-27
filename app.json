@@ -7,17 +7,17 @@
     "icon": "./assets/Gold.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/Black.png",
+      "image": "./assets/Gold.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/Black.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/Gold.png",
+        "backgroundColor": "#000000"
       }
     },
     "web": {
