@@ -8,6 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {ActivityIndicator, Text, View} from "react-native";
 import HomeScreen from "./screens/HomeScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import BarbershopProfileScreen from "./screens/BarbershopProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -49,13 +50,14 @@ const AppNavigator = () => {
 
     return (
         <Stack.Navigator
-            initialRouteName={user.loggedInUser ? "Tab" : "Login"}
+            initialRouteName={user.loggedInUser?.id ? "Tab" : "Login"}
             screenOptions={{headerShown: false}}
         >
             <Stack.Screen name="Home" component={HomeScreen}/>
             <Stack.Screen name="Register" component={RegisterScreen}/>
             <Stack.Screen name="Login" component={LoginScreen}/>
             <Stack.Screen name="Profile" component={ProfileScreen}/>
+            <Stack.Screen name="Barbershop" component={BarbershopProfileScreen}/>
             <Stack.Screen name="Tab" component={TabNavigator}/>
         </Stack.Navigator>
     );

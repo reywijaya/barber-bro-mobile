@@ -1,23 +1,49 @@
 import React from 'react';
-import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./screens/HomeScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import AppointmentScreen from "./screens/AppointmentScreen";
-import {Ionicons} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+    
     return (
         <Tab.Navigator
-            screenOptions={{headerShown: false, tabBarShowLabel: true}}
+            screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused, color, size }) => {
+                    let iconName;
+                    if (route.name === "Home") {
+                        iconName = focused ? "home" : "home-outline";
+                    } else if (route.name === "Appointment") {
+                        iconName = focused ? "calendar" : "calendar-outline";
+                    } else if (route.name === "Profile") {
+                        iconName = focused ? "person" : "person-outline";
+                    }
+
+                    return <Ionicons name={iconName} size={size} color={color} />;
+                },
+                tabBarActiveTintColor: "#e4e4e7",
+                tabBarStyle: {
+                    backgroundColor: "#18181b",
+                    borderTopColor: "transparent",
+                    height: 50,
+                    paddingTop: 5,
+                },
+                tabBarLabelStyle: {
+                    fontSize: 12,
+                },
+                tabBarShowLabel: false,
+                headerShown: false,
+            })}
         >
             <Tab.Screen
                 name="Home"
                 component={HomeScreen}
                 options={{
-                    tabBarIcon: () => (
-                        <Ionicons name="home-outline" size={20} color="black"/>
+                    tabBarIcon: ({ focused, color, size }) => (
+                        <Ionicons name="home" size={size} color={color} />
                     ),
                 }}
             />
@@ -25,8 +51,8 @@ const TabNavigator = () => {
                 name="Appointment"
                 component={AppointmentScreen}
                 options={{
-                    tabBarIcon: () => (
-                        <Ionicons name="calendar-outline" size={20} color="black"/>
+                    tabBarIcon: ({ focused, color, size }) => (
+                        <Ionicons name="calendar" size={size} color={color} />
                     ),
                 }}
             />
@@ -34,8 +60,8 @@ const TabNavigator = () => {
                 name="Profile"
                 component={ProfileScreen}
                 options={{
-                    tabBarIcon: () => (
-                        <Ionicons name="person-outline" size={20} color="black"/>
+                    tabBarIcon: ({ focused, color, size }) => (
+                        <Ionicons name="person" size={size} color={color} />
                     ),
                 }}
             />
@@ -44,3 +70,4 @@ const TabNavigator = () => {
 };
 
 export default TabNavigator;
+

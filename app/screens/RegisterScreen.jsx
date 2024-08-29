@@ -100,7 +100,7 @@ export default function RegisterScreen({navigation}) {
     };
 
     return (
-        <SafeAreaView className="flex flex-col h-screen bg-black py-10 px-6">
+        <SafeAreaView className="flex flex-col h-screen bg-black ">
             <ScrollView>
                 <View className="items-center">
                     <Image
