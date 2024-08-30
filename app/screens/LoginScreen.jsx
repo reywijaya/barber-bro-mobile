@@ -1,5 +1,6 @@
 import {
   Image,
+  Pressable,
   ScrollView,
   Text,
   TextInput,
@@ -12,12 +13,17 @@ import axiosInstance from "../service/axios";
 import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CheckBox } from "react-native-elements";
+import { useTogglePasswordVisibility } from "../hooks/useTogglePasswordVisibility";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [data, setData] = useState([]);
   const dispatch = useDispatch();
+  const { isPasswordVisible, togglePasswordVisibility, rightIcon } =
+    useTogglePasswordVisibility();
 
   const handleLogin = async () => {
     if (email === "" || password === "") {
@@ -38,8 +44,7 @@ export const LoginScreen = ({ navigation }) => {
         email,
         password,
       });
-
-      if (!response.data) {
+      if (!response.data.data) {
         alert("Login failed please check your email and password");
         return;
       }
@@ -48,23 +53,23 @@ export const LoginScreen = ({ navigation }) => {
       if (rememberMe) {
         await AsyncStorage.setItem(
           "loggedInUser",
-          JSON.stringify(response.data)
+          JSON.stringify(response.data.data)
         );
       }
 
       dispatch({
         type: "LOGIN",
-        payload: response.data,
+        payload: response.data.data,
       });
+      setData(response.data.data);
 
       navigation.navigate("Tab", {
         screen: "Home",
       });
     } catch (error) {
-      alert(error.response);
+      alert("Login failed please check your email and password");
     }
   };
-//   console.log(rememberMe);
 
   return (
     <SafeAreaView>
@@ -92,14 +97,23 @@ export const LoginScreen = ({ navigation }) => {
               />
             </View>
             <View className="mb-4 px-2">
-              <TextInput
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                className="bg-gray-800 p-3 rounded text-white text-lg"
-                placeholder="Password"
-                placeholderTextColor="#6b7280"
-              />
+              <View className="flex-row items-center bg-gray-800 p-3 rounded">
+                <TextInput
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!isPasswordVisible}
+                  className="text-white text-lg flex-1"
+                  placeholder="Password"
+                  placeholderTextColor="#6b7280"
+                />
+                <Pressable onPress={togglePasswordVisibility}>
+                  <MaterialCommunityIcons
+                    name={rightIcon}
+                    size={24}
+                    color="white"
+                  />
+                </Pressable>
+              </View>
             </View>
             <View className="flex-row items-center mb-4">
               <CheckBox
@@ -114,7 +128,6 @@ export const LoginScreen = ({ navigation }) => {
                 checkedColor="#e4e4e7"
               />
               <Text className="text-zinc-400">Remember me</Text>
-              
             </View>
             <View className="h-[1px] bg-gray-700 m-2" />
             <View className="my-4 px-2">

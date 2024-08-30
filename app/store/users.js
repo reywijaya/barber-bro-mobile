@@ -8,6 +8,8 @@ export const user = (state = INITIAL_STATE, action) => {
         return {...state, loggedInUser: action.payload};
     } else if (action.type === "LOGOUT") {
         return {...state, loggedInUser: {}};
+    }else if (action.type === "EDIT") {
+        return {...state, loggedInUser: action.payload};
     }
     return state;
 };

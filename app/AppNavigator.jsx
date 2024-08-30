@@ -9,22 +9,24 @@ import {ActivityIndicator, Text, View} from "react-native";
 import HomeScreen from "./screens/HomeScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import BarbershopProfileScreen from "./screens/BarbershopProfileScreen";
+import { PaymentScreen } from "./screens/PaymentScreen";
+import EditProfileScreen from "./screens/EditProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
     const [loading, setLoading] = useState(true);
-    const user = useSelector((state) => state.loggedInUser);
+    const user = useSelector((state) => state.loggedInUser.loggedInUser);
     const dispatch = useDispatch();
-    console.log("userID : ", user.loggedInUser.id);
+    console.log("userId : ", user.userId);
 
     const checkLoggedInUser = async () => {
         try {
             const loggedInUser = await AsyncStorage.getItem("loggedInUser");
-            if (loggedInUser) {
+            if (loggedInUser.loggedInUser) {
                 dispatch({
                     type: "LOGIN",
-                    payload: JSON.parse(loggedInUser),
+                    payload: JSON.parse(loggedInUser.loggedInUser),
                 });
                 setLoading(false);
             }
@@ -58,6 +60,8 @@ const AppNavigator = () => {
             <Stack.Screen name="Login" component={LoginScreen}/>
             <Stack.Screen name="Profile" component={ProfileScreen}/>
             <Stack.Screen name="Barbershop" component={BarbershopProfileScreen}/>
+            <Stack.Screen name="Payment" component={PaymentScreen}/>
+            <Stack.Screen name="EditProfile" component={EditProfileScreen}/>
             <Stack.Screen name="Tab" component={TabNavigator}/>
         </Stack.Navigator>
     );

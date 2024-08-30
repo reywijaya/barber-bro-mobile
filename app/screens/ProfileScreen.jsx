@@ -13,8 +13,8 @@ import React from "react";
 
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.loggedInUser);
-  console.log("user : ", user);
+  const user = useSelector((state) => state.loggedInUser.loggedInUser);
+  // console.log("user : ", user);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("loggedInUser");
@@ -34,8 +34,8 @@ export default function ProfileScreen({ navigation }) {
               className="w-20 h-20 rounded-full"
             />
             <View>
-              <Text className="text-gray-200 font-bold text-xl">
-                Jasmine Green Tea
+              <Text className="text-white font-bold text-2xl">
+                {user.email}
               </Text>
               <Text className="text-gray-400 text-xs">
                 you may think that the sun don't shine
@@ -53,7 +53,7 @@ export default function ProfileScreen({ navigation }) {
               <Text className="text-gray-400 text-lg py-2">Account</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#9ca3af" />
+              <Feather name="arrow-right" size={24} color="#9ca3af" onPress={() => navigation.navigate("EditProfile")}/>
             </View>
           </View>
           <View className="flex-row items-center justify-between">
