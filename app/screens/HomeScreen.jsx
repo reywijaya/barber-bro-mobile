@@ -7,11 +7,16 @@ import {
   Image,
   RefreshControl,
   ImageBackground,
+  Alert,
 } from "react-native";
 import { SearchBar } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getBarbershop } from "../service/fetchDataBarberShop";
+import { useDispatch, useSelector } from "react-redux";
+
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getBarbershop } from "../service/fetchDataBarberShop";
+import { getBarbershops } from "../store/barbershops";
 
 const toTitleCase = (str) => {
   return str.replace(
@@ -22,14 +27,34 @@ const toTitleCase = (str) => {
 
 const HomeScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
-  const [barbershopData, setBarbershopData] = useState();
   const [refreshing, setRefreshing] = useState(false);
+  const dispatch = useDispatch();
+  const barbershopData = useSelector((state) => state.barbershops.barbershops);
+  // console.log("barbershopData", barbershopData);
 
   useEffect(() => {
-    getBarbershop().then((data) => {
-      setBarbershopData(data);
-    });
-  }, []);
+    const fetchBarbershopData = async () => {
+      const data = await getBarbershop();
+      // console.log("data", data);
+      dispatch(getBarbershops(data));
+    };
+
+    fetchBarbershopData();
+
+    const loadUserData = async () => {
+      try {
+        const storedUserData = await AsyncStorage.getItem("loggedInUser");
+        if (storedUserData) {
+          const userData = JSON.parse(storedUserData);
+          Alert.alert("Welcome", `Welcome back, ${userData.email}!`);
+        }
+      } catch (error) {
+        console.error("Failed to load user data from AsyncStorage:", error);
+      }
+    };
+
+    loadUserData();
+  }, [dispatch]);
 
   const updateSearch = (search) => {
     setSearch(search);
@@ -40,17 +65,18 @@ const HomeScreen = ({ navigation }) => {
       return barbershopData;
     }
 
-    return barbershopData.filter((item) => {
-      return item.name.toLowerCase().includes(search.toLowerCase());
-    });
+    return barbershopData.filter((item) =>
+      item.name.toLowerCase().includes(search.toLowerCase())
+    );
   }, [search, barbershopData]);
+  // console.log("filteredBarbershopData", filteredBarbershopData);
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    getBarbershop().then((data) => {
-      setBarbershopData(data);
-      setRefreshing(false);
-    });
+    const data = await getBarbershop();
+    // console.log("data", data);
+    dispatch(getBarbershops(data));
+    setRefreshing(false);
   };
 
   return (
@@ -75,8 +101,9 @@ const HomeScreen = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {filteredBarbershopData?.map((item) => (
-          <View key={item.barbershop_id} className="flex flex-col bg-black p-5">
+        {filteredBarbershopData.map((item) => (
+          
+          <View key={item.id} className="flex flex-col bg-black p-5">
             <View className="rounded-lg items-center">
               <ImageBackground
                 source={{

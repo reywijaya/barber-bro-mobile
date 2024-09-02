@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
 import {
   Alert,
-  Image,
   ScrollView,
   Text,
   TextInput,
@@ -11,40 +10,35 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axiosInstance from "../service/axios";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { RadioGroup } from "react-native-radio-buttons-group";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function EditProfileScreen({ navigation }) {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.loggedInUser.loggedInUser);
+  const user = useSelector((state) => state.user.loggedInUser);
+  console.log(user);
 
-  const [name, setName] = useState(user.name || "");
-  const [gender, setGender] = useState(user.gender || "");
+  const [firstName, setFirstName] = useState(user.firstName || "");
+  const [surname, setSurname] = useState(user.surname || "");
   const [phone, setPhone] = useState(user.phone || "");
   const [address, setAddress] = useState(user.address || "");
-  const [email, setEmail] = useState(user.email || "");
-  const [password, setPassword] = useState(user.password || "");
-  const [confirmPassword, setConfirmPassword] = useState(user.password || "");
-  // Gender selection setup
-  const [selectedGender, setSelectedGender] = useState(
-    user.gender === "male" ? "male" : "female"
+  const [about, setAbout] = useState(user.about || "");
+  const [isMale, setIsMale] = useState(user.is_male || true);
+  const [dateOfBirth, setDateOfBirth] = useState(
+    user.date_of_birth ? new Date(user.date_of_birth).getTime() : new Date().getTime()
   );
-  // State dan fungsi untuk mengelola visibilitas password
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // State dan fungsi untuk mengelola visibilitas confirm password
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
-    useState(false);
-  const toggleConfirmPasswordVisibility = () => {
-    setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate ? selectedDate.getTime() : dateOfBirth;
+    setShowDatePicker(false);
+    setDateOfBirth(currentDate);
   };
+  // console.log(dateOfBirth);
 
   const handleSubmit = async () => {
-    if (!name || !gender || !phone || !address || !email) {
+    if (!firstName || !surname || !phone || !address || !about) {
       Alert.alert("Error", "All fields are required.");
       return;
     }
@@ -52,34 +46,31 @@ export default function EditProfileScreen({ navigation }) {
       Alert.alert("Error", "Phone number must be between 10 and 13 digits.");
       return;
     }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
-      return;
-    }
-
-    if (password && password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
-      return;
-    }
 
     const updatedData = {
-      name,
-      gender,
+      firstName,
+      surname,
       phone,
       address,
-      email,
-      ...(password && { password }), // Sertakan password hanya jika diisi
+      about,
+      is_male: isMale,
+      date_of_birth: dateOfBirth, 
     };
 
     try {
       const response = await axiosInstance.put(
-        "/customer/update-profile",
-        updatedData
+        "/customers/current",
+        updatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
       );
       dispatch({ type: "EDIT", payload: response.data });
       Alert.alert("Success", "Profile updated successfully!");
     } catch (error) {
-      console.error(error.message);
+      console.error(error.response.data);
       Alert.alert("Error", "Failed to update profile. Please try again.");
     }
   };
@@ -89,7 +80,7 @@ export default function EditProfileScreen({ navigation }) {
       {
         id: "male",
         label: "Male",
-        value: "male",
+        value: true,
         color: "white",
         selectedColor: "white",
         unselectedColor: "white",
@@ -98,7 +89,7 @@ export default function EditProfileScreen({ navigation }) {
       {
         id: "female",
         label: "Female",
-        value: "female",
+        value: false,
         color: "white",
         selectedColor: "white",
         unselectedColor: "white",
@@ -108,135 +99,116 @@ export default function EditProfileScreen({ navigation }) {
     []
   );
 
-  const handleGenderChange = (id) => {
-    setSelectedGender(id);
-    setGender(radioButtons.find((item) => item.id === id).value);
-  };
-
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <ScrollView horizontal={false} className="h-screen">
-        <View className="items-center">
-          <Image
-            source={require("../../assets/Gold.png")}
-            className="w-36 h-36"
-          />
-        </View>
-        <View className="gap-2 items-center">
-          <Text className="text-white font-bold text-3xl">Edit Profile</Text>
-        </View>
-        <View className="gap-3 my-4 px-4">
-          {/* Form untuk Name */}
-          <View className="mb-4">
-            <TextInput
-              placeholder="Name"
-              placeholderTextColor="#6b7280"
-              value={name}
-              onChangeText={(text) => setName(text)}
-              className="bg-gray-700 p-3 rounded text-white text-lg"
-            />
-          </View>
-
-          {/* Form untuk Gender */}
-          <View className="mb-4">
-            <RadioGroup
-              layout="row"
-              radioButtons={radioButtons}
-              onPress={handleGenderChange}
-              selectedId={selectedGender}
-              className="flex-row"
-            />
-          </View>
-
-          {/* Form untuk Phone */}
-          <View className="mb-4">
-            <TextInput
-              placeholder="Phone"
-              placeholderTextColor="#6b7280"
-              value={phone}
-              onChangeText={(text) => setPhone(text)}
-              className="bg-gray-700 p-3 rounded text-white text-lg"
-              keyboardType="phone-pad"
-            />
-          </View>
-
-          {/* Form untuk Address */}
-          <View className="mb-4">
-            <TextInput
-              placeholder="Address"
-              placeholderTextColor="#6b7280"
-              value={address}
-              onChangeText={(text) => setAddress(text)}
-              className="bg-gray-700 p-3 rounded text-white text-lg"
-            />
-          </View>
-
-          {/* Form untuk Email */}
-          <TextInput
-            placeholder="Email"
-            placeholderTextColor="#6b7280"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            className="bg-gray-800 p-3 rounded text-white text-lg"
-            keyboardType="email-address"
-          />
-
-          {/* Form untuk Password */}
-          <View className="flex-row items-center bg-gray-800 p-3 rounded">
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!isPasswordVisible}
-              className="text-white text-lg flex-1"
-              placeholder="Password"
-              placeholderTextColor="#6b7280"
-            />
-            <Pressable onPress={togglePasswordVisibility}>
-              <MaterialCommunityIcons
-                name={isPasswordVisible ? "eye-off" : "eye"}
-                size={24}
-                color="white"
-              />
-            </Pressable>
-          </View>
-
-          {/* Form untuk Confirm Password */}
-          <View className="flex-row items-center bg-gray-800 p-3 rounded">
-            <TextInput
-              placeholder="Confirm Password"
-              placeholderTextColor="#6b7280"
-              value={confirmPassword}
-              onChangeText={(text) => setConfirmPassword(text)}
-              className="text-white text-lg flex-1"
-              secureTextEntry={!isConfirmPasswordVisible}
-            />
-            <Pressable onPress={toggleConfirmPasswordVisibility}>
-              <MaterialCommunityIcons
-                name={isConfirmPasswordVisible ? "eye-off" : "eye"}
-                size={24}
-                color="white"
-              />
-            </Pressable>
-          </View>
-
-          {/* Separator */}
-          <View className="h-[1px] bg-gray-700 my-2" />
-
-          {/* Submit Button */}
-          <TouchableOpacity
-            onPress={handleSubmit}
-            className="bg-white py-2 rounded my-2"
-          >
-            <Text className="font-bold text-lg text-center">Save Changes</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Tab")}
-            className="bg-gray-800 py-2 rounded my-2"
-          >
-            <Text className="font-bold text-white text-lg text-center">
-              Back to Profile
+    <SafeAreaView>
+      <ScrollView horizontal={false} >
+        <View className="bg-black p-4">
+          <View className="gap-2 items-center ">
+            <Text className="text-zinc-100 font-bold text-3xl">
+              Edit Profile
             </Text>
-          </TouchableOpacity>
+          </View>
+          <View className="gap-3 my-4 px-4">
+            <View className="mb-4">
+              <TextInput
+                placeholder="First Name"
+                placeholderTextColor="#a1a1aa"
+                value={firstName}
+                onChangeText={(text) => setFirstName(text)}
+                className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
+              />
+            </View>
+
+            <View className="mb-4">
+              <TextInput
+                placeholder="Surname"
+                placeholderTextColor="#a1a1aa"
+                value={surname}
+                onChangeText={(text) => setSurname(text)}
+                className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
+              />
+            </View>
+
+            <View className="mb-4">
+              <TextInput
+                placeholder="Phone"
+                placeholderTextColor="#a1a1aa"
+                value={phone}
+                onChangeText={(text) => setPhone(text)}
+                className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            <View className="mb-4">
+              <TextInput
+                placeholder="Address"
+                placeholderTextColor="#a1a1aa"
+                value={address}
+                onChangeText={(text) => setAddress(text)}
+                className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
+              />
+            </View>
+
+            <View className="mb-4">
+              <TextInput
+                placeholder="About"
+                placeholderTextColor="#a1a1aa"
+                value={about}
+                onChangeText={(text) => setAbout(text)}
+                className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
+              />
+            </View>
+
+            <View className="mb-4">
+              <RadioGroup
+                layout="row"
+                radioButtons={radioButtons}
+                onPress={(id) => setIsMale(id === "male")}
+                selectedId={isMale ? "male" : "female"}
+                className="flex-row"
+              />
+            </View>
+
+            <View className="mb-4">
+              <Pressable
+                onPress={() => setShowDatePicker(true)}
+                className="bg-zinc-700 p-3 rounded"
+              >
+                <Text className="text-zinc-100 text-lg">
+                  {new Date(dateOfBirth).toDateString()}
+                </Text>
+              </Pressable>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={new Date(dateOfBirth)}
+                  mode="date"
+                  display="calendar"
+                  onChange={handleDateChange}
+                  maximumDate={new Date()}
+                />
+              )}
+            </View>
+
+            <View className="h-[1px] bg-zinc-700 my-2" />
+
+            <TouchableOpacity
+              onPress={handleSubmit}
+              className="bg-zinc-100 py-2 rounded my-2"
+            >
+              <Text className="font-bold text-lg text-center">
+                Save Changes
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Tab")}
+              className="bg-zinc-800 py-2 rounded my-2"
+            >
+              <Text className="font-bold text-zinc-100 text-lg text-center">
+                Back to Profile
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

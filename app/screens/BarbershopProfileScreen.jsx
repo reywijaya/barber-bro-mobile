@@ -59,6 +59,7 @@ export default function BarbershopProfileScreen({ route, navigation }) {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
+  // console.log("Data: ", barbershop.id);
 
   const fetchData = async () => {
     try {
@@ -143,7 +144,7 @@ export default function BarbershopProfileScreen({ route, navigation }) {
             </View>
 
             {/* Location and Description */}
-            <TouchableOpacity className="flex-row justify-center items-center rounded-lg p-2 bg-zinc-900">
+            <TouchableOpacity className="flex-row justify-center items-center rounded-lg p-2 bg-zinc-900" onPress={() => navigation.navigate("Maps", { latitude: barbershop.latitude, longitude: barbershop.longitude, markerTitle: barbershop.name })}>
               <View className="px-2">
                 <Ionicons name="location-outline" size={20} color="#e4e4e7" />
               </View>
@@ -304,7 +305,7 @@ export default function BarbershopProfileScreen({ route, navigation }) {
       </ScrollView>
       <TouchableOpacity
         className="absolute bottom-0 right-0 left-0 bg-opacity-100 bg-zinc-200 p-3 mx-2 rounded-lg"
-        onPress={() => console.log("Book Now")}
+        onPress={() => navigation.navigate("Appointment", { barbershop })}
       >
         <Text className="text-zinc-900 font-bold text-center">Book Now</Text>
       </TouchableOpacity>

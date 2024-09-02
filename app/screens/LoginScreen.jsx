@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axiosInstance from "../service/axios";
 import { useDispatch } from "react-redux";
@@ -15,15 +15,33 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CheckBox } from "react-native-elements";
 import { useTogglePasswordVisibility } from "../hooks/useTogglePasswordVisibility";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { login } from "../store/users";
 
 export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [data, setData] = useState([]);
   const dispatch = useDispatch();
   const { isPasswordVisible, togglePasswordVisibility, rightIcon } =
     useTogglePasswordVisibility();
+  // console.log(rememberMe);
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const userData = await AsyncStorage.getItem("loggedInUser");
+        if (userData) {
+          const { email, rememberMe } = JSON.parse(userData);
+          setEmail(email);
+          setRememberMe(rememberMe);
+        }
+      } catch (error) {
+        console.error("Failed to load user data from AsyncStorage:", error);
+      }
+    };
+
+    loadUserData();
+  }, []);
 
   const handleLogin = async () => {
     if (email === "" || password === "") {
@@ -45,29 +63,28 @@ export const LoginScreen = ({ navigation }) => {
         password,
       });
       if (!response.data.data) {
-        alert("Login failed please check your email and password");
+        alert("Login failed, please check your email and password");
         return;
       }
       alert("Login successful");
 
-      if (rememberMe) {
+      if (rememberMe===true) {
         await AsyncStorage.setItem(
           "loggedInUser",
-          JSON.stringify(response.data.data)
+          JSON.stringify({ email, rememberMe })
         );
+
+      } else {
+        await AsyncStorage.removeItem("loggedInUser");
       }
 
-      dispatch({
-        type: "LOGIN",
-        payload: response.data.data,
-      });
-      setData(response.data.data);
+      dispatch(login(response.data.data));
 
       navigation.navigate("Tab", {
         screen: "Home",
       });
     } catch (error) {
-      alert("Login failed please check your email and password");
+      alert("Login failed, please check your email and password");
     }
   };
 
@@ -132,10 +149,10 @@ export const LoginScreen = ({ navigation }) => {
             <View className="h-[1px] bg-gray-700 m-2" />
             <View className="my-4 px-2">
               <TouchableOpacity
-                className="bg-white rounded py-2"
+                className="bg-zinc-200 rounded py-2"
                 onPress={handleLogin}
               >
-                <Text className="font-bold text-lg text-center">Log in</Text>
+                <Text className="font-bold text-lg text-center text-zinc-800">Log in</Text>
               </TouchableOpacity>
             </View>
           </View>

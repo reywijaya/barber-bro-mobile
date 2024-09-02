@@ -1,6 +1,12 @@
-import { combineReducers } from "redux";
-import { user } from "./users";
+import { configureStore } from "@reduxjs/toolkit";
+import userReducer from "./users";
+import barbershopsReducer from "./barbershops";
 
-export const reducers = combineReducers({
-    loggedInUser: user,
-});
+const store= configureStore({
+    reducer:{
+        user: userReducer,
+        barbershops: barbershopsReducer
+    }
+})
+
+export default store

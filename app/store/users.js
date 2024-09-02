@@ -1,15 +1,25 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 const INITIAL_STATE = {
-    loggedInUser: {},
-    message: "Hello Gosling 3",
+  loggedInUser: {},
+  message: "Hello Gosling 3",
 };
 
-export const user = (state = INITIAL_STATE, action) => {
-    if (action.type === "LOGIN") {
-        return {...state, loggedInUser: action.payload};
-    } else if (action.type === "LOGOUT") {
-        return {...state, loggedInUser: {}};
-    }else if (action.type === "EDIT") {
-        return {...state, loggedInUser: action.payload};
-    }
-    return state;
-};
+const users = createSlice({
+  name: 'user',
+  initialState: INITIAL_STATE,
+  reducers: {
+    login(state, action) {
+      state.loggedInUser = action.payload;
+    },
+    logout(state) {
+      state.loggedInUser = {};
+    },
+    edit(state, action) {
+      state.loggedInUser = action.payload;
+    },
+  },
+});
+
+export const { login, logout, edit } = users.actions;
+export default users.reducer;

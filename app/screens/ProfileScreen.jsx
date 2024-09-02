@@ -13,7 +13,7 @@ import React from "react";
 
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.loggedInUser.loggedInUser);
+  const user = useSelector((state) => state.user.loggedInUser);
   // console.log("user : ", user);
 
   const handleLogout = async () => {
