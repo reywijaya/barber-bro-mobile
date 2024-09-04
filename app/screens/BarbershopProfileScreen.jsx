@@ -274,7 +274,7 @@ export default function BarbershopProfileScreen({ route, navigation }) {
               <View className="bg-zinc-900 p-2 rounded-lg">
                 <ScrollView>
                   {reviews.map((item) => (
-                    <View className="bg-zinc-900  flex flex-col mb-4">
+                    <View key={item.id} className="bg-zinc-900  flex flex-col mb-4">
                       <View className="flex-row items-center justify-between">
                         <Image
                           source={{ uri: item.profile_image }}

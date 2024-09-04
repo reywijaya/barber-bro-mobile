@@ -6,13 +6,16 @@ import TabNavigator from "./TabNavigator";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Text, View } from "react-native";
-import HomeScreen from "./screens/HomeScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import BarbershopProfileScreen from "./screens/BarbershopProfileScreen";
 import { PaymentScreen } from "./screens/PaymentScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import MapsComponent from "./component/MapsComponent";
 import { login } from "./store/users";
+import HelpScreen from "./screens/HelpScreen";
+import AboutScreen from "./screens/AboutScreen";
+import PrivateScreen from "./screens/PrivateScreen";
+import NotificationScreen from "./screens/NotificationScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -62,6 +65,10 @@ const AppNavigator = () => {
       <Stack.Screen name="Payment" component={PaymentScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="Maps" component={MapsComponent} />
+      <Stack.Screen name="HelpCenter" component={HelpScreen} />
+      <Stack.Screen name="About" component={AboutScreen} />
+      <Stack.Screen name="PrivacyPolicy" component={PrivateScreen} />
+      <Stack.Screen name="Notification" component={NotificationScreen} />
       <Stack.Screen name="Tab" component={TabNavigator} />
     </Stack.Navigator>
   );

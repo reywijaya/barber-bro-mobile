@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Alert,
   ScrollView,
@@ -13,20 +13,23 @@ import axiosInstance from "../service/axios";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
+import { setProfileData } from "../store/profileData";
+import { getDataProfile } from "../service/fetchDataProfile";
 
 export default function EditProfileScreen({ navigation }) {
-  const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser);
-  console.log(user);
-
-  const [firstName, setFirstName] = useState(user.firstName || "");
-  const [surname, setSurname] = useState(user.surname || "");
-  const [phone, setPhone] = useState(user.phone || "");
-  const [address, setAddress] = useState(user.address || "");
-  const [about, setAbout] = useState(user.about || "");
-  const [isMale, setIsMale] = useState(user.is_male || true);
+  const profile = useSelector((state) => state.profileData.profileData);
+  // console.log(profile);
+  const [firstName, setFirstName] = useState(profile.firstName || "");
+  const [surname, setSurname] = useState(profile.surname || "");
+  const [phone, setPhone] = useState(profile.phone || "");
+  const [address, setAddress] = useState(profile.address || "");
+  const [about, setAbout] = useState(profile.about || "");
+  const [isMale, setIsMale] = useState(profile.is_male || true);
   const [dateOfBirth, setDateOfBirth] = useState(
-    user.date_of_birth ? new Date(user.date_of_birth).getTime() : new Date().getTime()
+    profile.date_of_birth
+      ? new Date(profile.date_of_birth).getTime()
+      : new Date().getTime()
   );
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -35,7 +38,8 @@ export default function EditProfileScreen({ navigation }) {
     setShowDatePicker(false);
     setDateOfBirth(currentDate);
   };
-  // console.log(dateOfBirth);
+
+  getDataProfile();
 
   const handleSubmit = async () => {
     if (!firstName || !surname || !phone || !address || !about) {
@@ -54,20 +58,15 @@ export default function EditProfileScreen({ navigation }) {
       address,
       about,
       is_male: isMale,
-      date_of_birth: dateOfBirth, 
+      date_of_birth: dateOfBirth,
     };
 
     try {
-      const response = await axiosInstance.put(
-        "/customers/current",
-        updatedData,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      dispatch({ type: "EDIT", payload: response.data });
+      await axiosInstance.put("/customers/current", updatedData, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       Alert.alert("Success", "Profile updated successfully!");
     } catch (error) {
       console.error(error.response.data);
@@ -101,7 +100,7 @@ export default function EditProfileScreen({ navigation }) {
 
   return (
     <SafeAreaView>
-      <ScrollView horizontal={false} >
+      <ScrollView horizontal={false}>
         <View className="bg-black p-4">
           <View className="gap-2 items-center ">
             <Text className="text-zinc-100 font-bold text-3xl">

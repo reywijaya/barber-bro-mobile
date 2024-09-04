@@ -1,7 +1,13 @@
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Feather,
@@ -10,12 +16,12 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import React from "react";
+import UserAvatar from "react-native-user-avatar";
 
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser);
-  // console.log("user : ", user);
-
+  
   const handleLogout = async () => {
     await AsyncStorage.removeItem("loggedInUser");
     dispatch({ type: "LOGOUT" });
@@ -23,16 +29,11 @@ export default function ProfileScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView>
-      <ScrollView>
-        <View className="flex flex-col bg-black p-4">
+    <SafeAreaView className="flex-1">
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View className="flex-1 bg-black p-4">
           <View className="flex-row gap-6 py-4">
-            <Image
-              source={{
-                uri: "https://cdn1-production-images-kly.akamaized.net/EkW4GPoCyNohCcl37diQznJqpJk=/1200x1200/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/4243489/original/075739700_1669706866-unknown_278188195_2911935799106242_7342000182256547621_n.jpg",
-              }}
-              className="w-20 h-20 rounded-full"
-            />
+            <UserAvatar size={60} name={user.email} bgColor="#64748b" />
             <View>
               <Text className="text-white font-bold text-2xl">
                 {user.email}
@@ -53,7 +54,12 @@ export default function ProfileScreen({ navigation }) {
               <Text className="text-gray-400 text-lg py-2">Account</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#9ca3af" onPress={() => navigation.navigate("EditProfile")}/>
+              <Feather
+                name="arrow-right"
+                size={24}
+                color="#9ca3af"
+                onPress={() => navigation.navigate("EditProfile")}
+              />
             </View>
           </View>
           <View className="flex-row items-center justify-between">
@@ -66,7 +72,12 @@ export default function ProfileScreen({ navigation }) {
               <Text className="text-gray-400 text-lg py-2">Notification</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#9ca3af" />
+              <Feather
+                name="arrow-right"
+                size={24}
+                color="#9ca3af"
+                onPress={() => navigation.navigate("Notification")}
+              />
             </View>
           </View>
           <View className="flex-row items-center justify-between">
@@ -77,7 +88,12 @@ export default function ProfileScreen({ navigation }) {
               </Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#9ca3af" />
+              <Feather
+                name="arrow-right"
+                size={24}
+                color="#9ca3af"
+                onPress={() => navigation.navigate("PrivacyPolicy")}
+              />
             </View>
           </View>
           <View className="h-[1px] bg-gray-700 my-2" />
@@ -113,7 +129,12 @@ export default function ProfileScreen({ navigation }) {
               <Text className="text-gray-400 text-lg py-2">About</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#9ca3af" />
+              <Feather
+                name="arrow-right"
+                size={24}
+                color="#9ca3af"
+                onPress={() => navigation.navigate("About")}
+              />
             </View>
           </View>
           <View className="flex-row items-center justify-between">
@@ -122,7 +143,12 @@ export default function ProfileScreen({ navigation }) {
               <Text className="text-gray-400 text-lg py-2">Help Center</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#9ca3af" />
+              <Feather
+                name="arrow-right"
+                size={24}
+                color="#9ca3af"
+                onPress={() => navigation.navigate("HelpCenter")}
+              />
             </View>
           </View>
           <View className="flex-row items-center justify-between">

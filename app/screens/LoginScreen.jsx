@@ -16,6 +16,7 @@ import { CheckBox } from "react-native-elements";
 import { useTogglePasswordVisibility } from "../hooks/useTogglePasswordVisibility";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { login } from "../store/users";
+import { getDataProfile } from "../service/fetchDataProfile";
 
 export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -68,16 +69,15 @@ export const LoginScreen = ({ navigation }) => {
       }
       alert("Login successful");
 
-      if (rememberMe===true) {
+      if (rememberMe === true) {
         await AsyncStorage.setItem(
           "loggedInUser",
           JSON.stringify({ email, rememberMe })
         );
-
       } else {
         await AsyncStorage.removeItem("loggedInUser");
       }
-
+      getDataProfile();
       dispatch(login(response.data.data));
 
       navigation.navigate("Tab", {
@@ -152,7 +152,9 @@ export const LoginScreen = ({ navigation }) => {
                 className="bg-zinc-200 rounded py-2"
                 onPress={handleLogin}
               >
-                <Text className="font-bold text-lg text-center text-zinc-800">Log in</Text>
+                <Text className="font-bold text-lg text-center text-zinc-800">
+                  Log in
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
