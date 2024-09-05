@@ -1,20 +1,19 @@
+import { useEffect } from "react";
 import { setProfileData } from "../store/profileData";
 import axiosInstance from "./axios";
-import { useDispatch, useSelector } from "react-redux";
 
-export const getDataProfile = async () => {
-  const user = useSelector((state) => state.user.loggedInUser);
-  const dispatch=useDispatch();
+export const getDataProfile = async (dispatch, token) => {
   try {
     const response = await axiosInstance.get("/customers/current", {
       headers: {
-        Authorization: `Bearer ${user.token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
+
     dispatch(setProfileData(response.data.data));
     return response.data.data;
   } catch (error) {
-    console.error("Error fetching profile data:", error.response.data.message);
-    throw error;
+    console.error(error.response?.data || error.message);
+    throw error; 
   }
 };
