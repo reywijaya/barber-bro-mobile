@@ -1,13 +1,8 @@
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Feather,
-  Ionicons,
-  MaterialCommunityIcons,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import {SafeAreaView} from "react-native-safe-area-context";
+import {Feather, Ionicons, MaterialCommunityIcons, MaterialIcons,} from "@expo/vector-icons";
 import React from "react";
 import UserAvatar from "react-native-user-avatar";
 
