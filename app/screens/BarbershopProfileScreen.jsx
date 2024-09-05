@@ -59,7 +59,6 @@ export default function BarbershopProfileScreen({ route, navigation }) {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
-  // console.log("Data: ", barbershop.id);
 
   const fetchData = async () => {
     try {
