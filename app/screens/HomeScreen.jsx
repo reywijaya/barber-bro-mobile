@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getBarbershop } from "../service/fetchDataBarberShop";
 import { getBarbershops } from "../store/barbershops";
+import { getDataProfile } from "../service/fetchDataProfile";
 
 const toTitleCase = (str) => {
   return str.replace(
@@ -30,16 +31,21 @@ const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch();
   const barbershopData = useSelector((state) => state.barbershops.barbershops);
-  // console.log("barbershopData", barbershopData);
+  const user = useSelector((state) => state.user.loggedInUser);
+  console.log("user", user);
+  const dataProfile=useSelector((state) => state.profileData.profileData);
+  console.log("dataProfile", dataProfile);
 
   useEffect(() => {
     const fetchBarbershopData = async () => {
       const data = await getBarbershop();
       // console.log("data", data);
       dispatch(getBarbershops(data));
+      getDataProfile(dispatch, user.token);
     };
 
     fetchBarbershopData();
+    
 
     const loadUserData = async () => {
       try {
@@ -76,6 +82,8 @@ const HomeScreen = ({ navigation }) => {
     const data = await getBarbershop();
     // console.log("data", data);
     dispatch(getBarbershops(data));
+    getDataProfile(dispatch, user.token);
+
     setRefreshing(false);
   };
 

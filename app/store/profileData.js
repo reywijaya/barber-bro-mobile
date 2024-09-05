@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createSlice } from "@reduxjs/toolkit";
 
 const INITIAL_STATE = {
@@ -10,6 +11,9 @@ const profileData = createSlice({
     reducers: {
         setProfileData: (state, action) => {
             state.profileData = action.payload;
+
+            // Simpan data profileData ke AsyncStorage
+            AsyncStorage.setItem('profileData', JSON.stringify(state.profileData));
         },
     },
 });

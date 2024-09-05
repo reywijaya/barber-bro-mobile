@@ -3,7 +3,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./screens/HomeScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import AppointmentScreen from "./screens/AppointmentScreen";
-import { Ionicons } from "@expo/vector-icons";
+import { Fontisto, Ionicons } from "@expo/vector-icons";
+import HistoryScreen from './screens/HistoryScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -48,11 +49,11 @@ const TabNavigator = () => {
                 }}
             />
             <Tab.Screen
-                name="Appointment"
-                component={AppointmentScreen}
+                name="History"
+                component={HistoryScreen}
                 options={{
                     tabBarIcon: ({ focused, color, size }) => (
-                        <Ionicons name="calendar" size={size} color={color} />
+                        <Fontisto name="history" size={size} color={color} />
                     ),
                 }}
             />

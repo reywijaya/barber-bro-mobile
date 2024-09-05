@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createSlice } from "@reduxjs/toolkit";
 
 const INITIAL_STATE = {
@@ -10,6 +11,9 @@ const appointment = createSlice({
     reducers: {
         setAppointments(state, action) {
             state.appointments = action.payload;
+
+            // Simpan data appointments ke AsyncStorage
+            AsyncStorage.setItem('appointments', JSON.stringify(state.appointments));
         },
     },
 });

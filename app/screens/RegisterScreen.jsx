@@ -69,7 +69,7 @@ export default function RegisterScreen({ navigation }) {
       Alert.alert("Success", "Registration Successful!");
       navigation.navigate("Login");
     } catch (error) {
-      console.error(error.message);
+      console.error(error);
       Alert.alert("Error", "Failed to register. Please try again.");
     }
   };

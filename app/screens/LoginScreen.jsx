@@ -77,7 +77,7 @@ export const LoginScreen = ({ navigation }) => {
       } else {
         await AsyncStorage.removeItem("loggedInUser");
       }
-      getDataProfile();
+      
       dispatch(login(response.data.data));
 
       navigation.navigate("Tab", {
@@ -85,6 +85,7 @@ export const LoginScreen = ({ navigation }) => {
       });
     } catch (error) {
       alert("Login failed, please check your email and password");
+      console.log(error.response.data);
     }
   };
 

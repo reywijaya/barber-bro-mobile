@@ -8,7 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Text, View } from "react-native";
 import ProfileScreen from "./screens/ProfileScreen";
 import BarbershopProfileScreen from "./screens/BarbershopProfileScreen";
-import { PaymentScreen } from "./screens/PaymentScreen";
+import { PaymentScreen, ReviewScreen } from "./screens/ReviewScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import MapsComponent from "./component/MapsComponent";
 import { login } from "./store/users";
@@ -16,6 +16,7 @@ import HelpScreen from "./screens/HelpScreen";
 import AboutScreen from "./screens/AboutScreen";
 import PrivateScreen from "./screens/PrivateScreen";
 import NotificationScreen from "./screens/NotificationScreen";
+import AppointmentScreen from "./screens/AppointmentScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -62,7 +63,9 @@ const AppNavigator = () => {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Barbershop" component={BarbershopProfileScreen} />
-      <Stack.Screen name="Payment" component={PaymentScreen} />
+      {/* <Stack.Screen name="Payment" component={PaymentScreen} /> */}
+      <Stack.Screen name="Appointment" component={AppointmentScreen} />
+      <Stack.Screen name="Review" component={ReviewScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="Maps" component={MapsComponent} />
       <Stack.Screen name="HelpCenter" component={HelpScreen} />

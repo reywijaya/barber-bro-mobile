@@ -1,11 +1,4 @@
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,7 +14,7 @@ import UserAvatar from "react-native-user-avatar";
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser);
-  
+
   const handleLogout = async () => {
     await AsyncStorage.removeItem("loggedInUser");
     dispatch({ type: "LOGOUT" });
@@ -33,7 +26,7 @@ export default function ProfileScreen({ navigation }) {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 bg-black p-4">
           <View className="flex-row gap-6 py-4">
-            <UserAvatar size={60} name={user.email} bgColor="#64748b" />
+            <UserAvatar size={60} name={user.email} bgColor="#9ca3af" />
             <View>
               <Text className="text-white font-bold text-2xl">
                 {user.email}
@@ -161,7 +154,6 @@ export default function ProfileScreen({ navigation }) {
             </View>
           </View>
           <View className="h-[1px] bg-gray-700 my-2" />
-          <Text className="text-gray-400 py-2">More info and support</Text>
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-2">
               <MaterialCommunityIcons
