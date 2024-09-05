@@ -17,6 +17,7 @@ import AboutScreen from "./screens/AboutScreen";
 import PrivateScreen from "./screens/PrivateScreen";
 import NotificationScreen from "./screens/NotificationScreen";
 import AppointmentScreen from "./screens/AppointmentScreen";
+import DetailsBookingScreen from "./screens/DetailsBookingScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -70,6 +71,7 @@ const AppNavigator = () => {
       <Stack.Screen name="Maps" component={MapsComponent} />
       <Stack.Screen name="HelpCenter" component={HelpScreen} />
       <Stack.Screen name="About" component={AboutScreen} />
+      <Stack.Screen name="DetailsBooking" component={DetailsBookingScreen} />
       <Stack.Screen name="PrivacyPolicy" component={PrivateScreen} />
       <Stack.Screen name="Notification" component={NotificationScreen} />
       <Stack.Screen name="Tab" component={TabNavigator} />
