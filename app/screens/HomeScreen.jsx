@@ -7,9 +7,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {AntDesign, FontAwesome, FontAwesome5, Ionicons, MaterialIcons} from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { getBarbershop } from "../service/fetchDataBarberShop";
 import { getBarbershops } from "../store/barbershops";
 import { getDataProfile } from "../service/fetchDataProfile";
+import { getBarbershop } from "../service/fetchDataBarberShop";
 
 const toTitleCase = (str) => {
     return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
@@ -35,7 +35,7 @@ const HomeScreen = ({navigation}) => {
     };
 
     useEffect(() => {
-        fetchBarbershopData();
+        getBarbershop();
         loadUserData();
     }, []);
 
