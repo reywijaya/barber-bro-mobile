@@ -20,7 +20,7 @@ export default function RegisterScreen({navigation}) {
     const togglePasswordVisibility = () => {
         setPasswordVisible(!isPasswordVisible);
     };
-
+  
     const toggleConfirmPasswordVisibility = () => {
         setConfirmPasswordVisible(!isConfirmPasswordVisible);
     };

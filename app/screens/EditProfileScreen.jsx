@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Alert,
   ScrollView,
@@ -13,33 +13,35 @@ import axiosInstance from "../service/axios";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
-import { setProfileData } from "../store/profileData";
 import { getDataProfile } from "../service/fetchDataProfile";
 
 export default function EditProfileScreen({ navigation }) {
   const user = useSelector((state) => state.user.loggedInUser);
   const profile = useSelector((state) => state.profileData.profileData);
-  // console.log(profile);
-  const [firstName, setFirstName] = useState(profile.firstName || "");
-  const [surname, setSurname] = useState(profile.surname || "");
-  const [phone, setPhone] = useState(profile.phone || "");
-  const [address, setAddress] = useState(profile.address || "");
-  const [about, setAbout] = useState(profile.about || "");
-  const [isMale, setIsMale] = useState(profile.is_male || true);
+  const dispatch = useDispatch();
+
+  const [firstName, setFirstName] = useState(profile?.firstName || "");
+  const [surname, setSurname] = useState(profile?.surname || "");
+  const [phone, setPhone] = useState(profile?.phone || "");
+  const [address, setAddress] = useState(profile?.address || "");
+  const [about, setAbout] = useState(profile?.about || "");
+  const [isMale, setIsMale] = useState(profile?.is_male || true);
   const [dateOfBirth, setDateOfBirth] = useState(
-    profile.date_of_birth
-      ? new Date(profile.date_of_birth).getTime()
-      : new Date().getTime()
+    profile?.date_of_birth ? new Date(profile.date_of_birth) : new Date()
   );
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  useEffect(() => {
+    if (user.token) {
+      getDataProfile(dispatch, user.token);
+    }
+  }, [user.token, dispatch]);
+
   const handleDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate ? selectedDate.getTime() : dateOfBirth;
+    const currentDate = selectedDate || dateOfBirth;
     setShowDatePicker(false);
     setDateOfBirth(currentDate);
   };
-
-  getDataProfile();
 
   const handleSubmit = async () => {
     if (!firstName || !surname || !phone || !address || !about) {
@@ -50,7 +52,7 @@ export default function EditProfileScreen({ navigation }) {
       Alert.alert("Error", "Phone number must be between 10 and 13 digits.");
       return;
     }
-
+  
     const updatedData = {
       firstName,
       surname,
@@ -58,19 +60,22 @@ export default function EditProfileScreen({ navigation }) {
       address,
       about,
       is_male: isMale,
-      date_of_birth: dateOfBirth,
+      date_of_birth: dateOfBirth.getTime(), // Ensure date is in ISO format
     };
-
+  
+    console.log('Updated Data:', updatedData); // Log the data being sent
+  
     try {
-      await axiosInstance.put("/customers/current", updatedData, {
+      const response = await axiosInstance.put("/customers/current", updatedData, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
+      console.log('Response:', response.data); // Log the API response
       Alert.alert("Success", "Profile updated successfully!");
     } catch (error) {
-      console.error(error.response.data);
-      Alert.alert("Error", "Failed to update profile. Please try again.");
+      console.error("Update Error:", error.response?.data || error.message);
+      Alert.alert("Error", `Failed to update profile. ${error.response?.data?.error || 'Please try again.'}`);
     }
   };
 
@@ -100,12 +105,10 @@ export default function EditProfileScreen({ navigation }) {
 
   return (
     <SafeAreaView>
-      <ScrollView horizontal={false}>
+      <ScrollView>
         <View className="bg-black p-4">
-          <View className="gap-2 items-center ">
-            <Text className="text-zinc-100 font-bold text-3xl">
-              Edit Profile
-            </Text>
+          <View className="gap-2 items-center">
+            <Text className="text-zinc-100 font-bold text-3xl">Edit Profile</Text>
           </View>
           <View className="gap-3 my-4 px-4">
             <View className="mb-4">
@@ -113,7 +116,7 @@ export default function EditProfileScreen({ navigation }) {
                 placeholder="First Name"
                 placeholderTextColor="#a1a1aa"
                 value={firstName}
-                onChangeText={(text) => setFirstName(text)}
+                onChangeText={setFirstName}
                 className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
               />
             </View>
@@ -123,7 +126,7 @@ export default function EditProfileScreen({ navigation }) {
                 placeholder="Surname"
                 placeholderTextColor="#a1a1aa"
                 value={surname}
-                onChangeText={(text) => setSurname(text)}
+                onChangeText={setSurname}
                 className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
               />
             </View>
@@ -133,7 +136,7 @@ export default function EditProfileScreen({ navigation }) {
                 placeholder="Phone"
                 placeholderTextColor="#a1a1aa"
                 value={phone}
-                onChangeText={(text) => setPhone(text)}
+                onChangeText={setPhone}
                 className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
                 keyboardType="phone-pad"
               />
@@ -144,7 +147,7 @@ export default function EditProfileScreen({ navigation }) {
                 placeholder="Address"
                 placeholderTextColor="#a1a1aa"
                 value={address}
-                onChangeText={(text) => setAddress(text)}
+                onChangeText={setAddress}
                 className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
               />
             </View>
@@ -154,7 +157,7 @@ export default function EditProfileScreen({ navigation }) {
                 placeholder="About"
                 placeholderTextColor="#a1a1aa"
                 value={about}
-                onChangeText={(text) => setAbout(text)}
+                onChangeText={setAbout}
                 className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
               />
             </View>
@@ -175,12 +178,12 @@ export default function EditProfileScreen({ navigation }) {
                 className="bg-zinc-700 p-3 rounded"
               >
                 <Text className="text-zinc-100 text-lg">
-                  {new Date(dateOfBirth).toDateString()}
+                  {dateOfBirth.toDateString()}
                 </Text>
               </Pressable>
               {showDatePicker && (
                 <DateTimePicker
-                  value={new Date(dateOfBirth)}
+                  value={dateOfBirth}
                   mode="date"
                   display="calendar"
                   onChange={handleDateChange}
@@ -195,17 +198,13 @@ export default function EditProfileScreen({ navigation }) {
               onPress={handleSubmit}
               className="bg-zinc-100 py-2 rounded my-2"
             >
-              <Text className="font-bold text-lg text-center">
-                Save Changes
-              </Text>
+              <Text className="font-bold text-lg text-center">Save Changes</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate("Tab")}
               className="bg-zinc-800 py-2 rounded my-2"
             >
-              <Text className="font-bold text-zinc-100 text-lg text-center">
-                Back to Profile
-              </Text>
+              <Text className="font-bold text-zinc-100 text-lg text-center">Back to Profile</Text>
             </TouchableOpacity>
           </View>
         </View>

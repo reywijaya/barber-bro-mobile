@@ -6,8 +6,10 @@ import {useDispatch, useSelector} from "react-redux";
 
 import {AntDesign, FontAwesome, FontAwesome5, Ionicons, MaterialIcons} from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {getBarbershop} from "../service/fetchDataBarberShop";
-import {getBarbershops} from "../store/barbershops";
+
+import { getBarbershop } from "../service/fetchDataBarberShop";
+import { getBarbershops } from "../store/barbershops";
+import { getDataProfile } from "../service/fetchDataProfile";
 
 const toTitleCase = (str) => {
     return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
@@ -20,11 +22,6 @@ const HomeScreen = ({navigation}) => {
     const [refreshing, setRefreshing] = useState(false);
     const dispatch = useDispatch();
     const barbershopData = useSelector((state) => state.barbershops.barbershops);
-
-    const fetchBarbershopData = async () => {
-        const data = await getBarbershop();
-        dispatch(getBarbershops(data));
-    };
 
     const loadUserData = async () => {
         try {
@@ -53,7 +50,7 @@ const HomeScreen = ({navigation}) => {
 
         return barbershopData.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()));
     }, [search, barbershopData]);
-
+  
     const onRefresh = async () => {
         setRefreshing(true);
         const data = await getBarbershop();

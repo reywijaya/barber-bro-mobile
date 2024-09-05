@@ -4,7 +4,6 @@ import { Text, TouchableOpacity, View, Alert } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
-import axios from 'axios';
 import { tailwind } from 'nativewind'; // import tailwind from nativewind
 
 const MapsComponent = ({ route, navigation }) => {
@@ -21,67 +20,28 @@ const MapsComponent = ({ route, navigation }) => {
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
+          Alert.alert("Permission Denied", "Please enable location services to use this feature.");
+          return;
+        }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setCurrentLocation(location.coords);
-      fetchRoute(location.coords.latitude, location.coords.longitude, latitude, longitude);
+        let location = await Location.getCurrentPositionAsync({});
+        setCurrentLocation(location.coords);
+
+        // Calculate the route (straight line)
+        setRouteCoordinates([
+          { latitude: location.coords.latitude, longitude: location.coords.longitude },
+          { latitude: latitude, longitude: longitude },
+        ]);
+      } catch (error) {
+        setErrorMsg("Error getting location");
+        // Alert.alert("Error", "Failed to retrieve current location. Please try again.");
+      }
     })();
   }, []);
-
-  const fetchRoute = async (startLat, startLng, endLat, endLng) => {
-    const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'; // Ganti dengan API Key Anda
-    try {
-      const response = await axios.get(`https://maps.googleapis.com/maps/api/directions/json`, {
-        params: {
-          origin: `${startLat},${startLng}`,
-          destination: `${endLat},${endLng}`,
-          key: GOOGLE_MAPS_API_KEY,
-        },
-      });
-
-      if (response.data.routes.length > 0) {
-        const points = response.data.routes[0].overview_polyline.points;
-        const decodedPoints = decodePolyline(points);
-        setRouteCoordinates(decodedPoints);
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to fetch route");
-    }
-  };
-
-  const decodePolyline = (encoded) => {
-    const points = [];
-    let index = 0, lat = 0, lng = 0;
-    while (index < encoded.length) {
-      let b, shift = 0, result = 0;
-      do {
-        b = encoded.charCodeAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      const dlat = (result & 1) !== 0 ? ~(result >> 1) : (result >> 1);
-      lat += dlat;
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.charCodeAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      const dlng = (result & 1) !== 0 ? ~(result >> 1) : (result >> 1);
-      lng += dlng;
-      points.push({
-        latitude: (lat / 1e5) + 0,
-        longitude: (lng / 1e5) + 0,
-      });
-    }
-    return points;
-  };
 
   const handleRegionChangeComplete = (region) => {
     setRegion(region);
@@ -144,11 +104,13 @@ const MapsComponent = ({ route, navigation }) => {
                 pinColor="blue"
               />
             )}
-            <Polyline
-              coordinates={routeCoordinates}
-              strokeColor="#FF0000"
-              strokeWidth={3}
-            />
+            {routeCoordinates.length > 0 && (
+              <Polyline
+                coordinates={routeCoordinates}
+                strokeColor="#FF0000"
+                strokeWidth={3}
+              />
+            )}
           </MapView>
 
           {/* Zoom Controls */}

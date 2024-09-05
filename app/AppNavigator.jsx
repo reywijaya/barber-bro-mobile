@@ -7,13 +7,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {ActivityIndicator, View} from "react-native";
 import ProfileScreen from "./screens/ProfileScreen";
 import BarbershopProfileScreen from "./screens/BarbershopProfileScreen";
-import {PaymentScreen} from "./screens/PaymentScreen";
+import { PaymentScreen, ReviewScreen } from "./screens/ReviewScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import MapsComponent from "./component/MapsComponent";
 import HelpScreen from "./screens/HelpScreen";
 import AboutScreen from "./screens/AboutScreen";
 import PrivateScreen from "./screens/PrivateScreen";
 import NotificationScreen from "./screens/NotificationScreen";
+import AppointmentScreen from "./screens/AppointmentScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import WelcomeScreen2 from "./screens/WelcomeScreen2";
 import WelcomeScreen3 from "./screens/WelcomeScreen3";
@@ -69,6 +70,30 @@ const AppNavigator = () => {
             <Stack.Screen name="Tab" component={TabNavigator}/>
         </Stack.Navigator>
     );
+  }
+
+  return (
+    <Stack.Navigator
+      initialRouteName={user?.id ? "Tab" : "Login"}
+      screenOptions={{ headerShown: false }}
+    >
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="Barbershop" component={BarbershopProfileScreen} />
+      {/* <Stack.Screen name="Payment" component={PaymentScreen} /> */}
+      <Stack.Screen name="Appointment" component={AppointmentScreen} />
+      <Stack.Screen name="Review" component={ReviewScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+      <Stack.Screen name="Maps" component={MapsComponent} />
+      <Stack.Screen name="HelpCenter" component={HelpScreen} />
+      <Stack.Screen name="About" component={AboutScreen} />
+      <Stack.Screen name="PrivacyPolicy" component={PrivateScreen} />
+      <Stack.Screen name="Notification" component={NotificationScreen} />
+      <Stack.Screen name="Tab" component={TabNavigator} />
+    </Stack.Navigator>
+  );
+
 };
 
 export default AppNavigator;
