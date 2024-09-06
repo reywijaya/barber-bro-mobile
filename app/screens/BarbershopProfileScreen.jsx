@@ -89,9 +89,11 @@ export default function BarbershopProfileScreen({ route, navigation }) {
   const handleBookNow = () => {
     if (!dataProfile.firstName || !dataProfile.surname) {
       alert("Please update your profile to book an appointment.");
-    } else {
-      () => navigation.navigate("Appointment", { barbershop });
+    }else{
+      navigation.navigate("Appointment", { barbershop });
     }
+      
+    
   };
 
   if (loading) {

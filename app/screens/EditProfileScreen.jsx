@@ -14,6 +14,7 @@ import { RadioGroup } from "react-native-radio-buttons-group";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
 import { getDataProfile } from "../service/fetchDataProfile";
+import { setProfileData } from "../store/profileData";
 
 export default function EditProfileScreen({ navigation }) {
   const user = useSelector((state) => state.user.loggedInUser);
@@ -52,7 +53,7 @@ export default function EditProfileScreen({ navigation }) {
       Alert.alert("Error", "Phone number must be between 10 and 13 digits.");
       return;
     }
-  
+
     const updatedData = {
       firstName,
       surname,
@@ -60,22 +61,33 @@ export default function EditProfileScreen({ navigation }) {
       address,
       about,
       is_male: isMale,
-      date_of_birth: dateOfBirth.getTime(), // Ensure date is in ISO format
+      date_of_birth: dateOfBirth.getTime(),
     };
-  
-    console.log('Updated Data:', updatedData); // Log the data being sent
-  
+
+    console.log("Updated Data:", updatedData);
+
     try {
-      const response = await axiosInstance.put("/customers/current", updatedData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      console.log('Response:', response.data); // Log the API response
+      const response = await axiosInstance.put(
+        "/customers/current",
+        updatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      console.log("Response:", response.data.data);
+      dispatch(setProfileData(response.data.data));
       Alert.alert("Success", "Profile updated successfully!");
+      navigation.navigate("Tab");
     } catch (error) {
       console.error("Update Error:", error.response?.data || error.message);
-      Alert.alert("Error", `Failed to update profile. ${error.response?.data?.error || 'Please try again.'}`);
+      Alert.alert(
+        "Error",
+        `Failed to update profile. ${
+          error.response?.data?.error || "Please try again."
+        }`
+      );
     }
   };
 
@@ -108,7 +120,9 @@ export default function EditProfileScreen({ navigation }) {
       <ScrollView>
         <View className="bg-black p-4">
           <View className="gap-2 items-center">
-            <Text className="text-zinc-100 font-bold text-3xl">Edit Profile</Text>
+            <Text className="text-zinc-100 font-bold text-3xl">
+              Edit Profile
+            </Text>
           </View>
           <View className="gap-3 my-4 px-4">
             <View className="mb-4">
@@ -198,13 +212,17 @@ export default function EditProfileScreen({ navigation }) {
               onPress={handleSubmit}
               className="bg-zinc-100 py-2 rounded my-2"
             >
-              <Text className="font-bold text-lg text-center">Save Changes</Text>
+              <Text className="font-bold text-lg text-center">
+                Save Changes
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate("Tab")}
               className="bg-zinc-800 py-2 rounded my-2"
             >
-              <Text className="font-bold text-zinc-100 text-lg text-center">Back to Profile</Text>
+              <Text className="font-bold text-zinc-100 text-lg text-center">
+                Back to Profile
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
