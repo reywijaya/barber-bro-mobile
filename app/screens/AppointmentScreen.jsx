@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   RefreshControl,
   TouchableOpacity,
 } from "react-native";
-import { CheckBox } from "react-native-elements";
+import { RadioGroup } from "react-native-radio-buttons-group";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
@@ -23,7 +23,6 @@ const toTitleCase = (str) => {
     (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
   );
 };
-
 const availableTimes = Array.from({ length: 13 }, (_, i) => {
   const hour = (9 + i).toString().padStart(2, "0");
   return `${hour}:00`;
@@ -31,7 +30,7 @@ const availableTimes = Array.from({ length: 13 }, (_, i) => {
 
 export default function AppointmentScreen({ route, navigation }) {
   const { barbershop } = route.params || {};
-  const [isSelected, setIsSelected] = useState({});
+  const [selectedServiceId, setSelectedServiceId] = useState(null);
   const [totalPayment, setTotalPayment] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -57,38 +56,46 @@ export default function AppointmentScreen({ route, navigation }) {
   }, []);
 
   useEffect(() => {
-    // If the barbershop has changed, reset totalPayment
-    if (barbershop && previousBarbershop && barbershop.id !== previousBarbershop.id) {
+    if (
+      barbershop &&
+      previousBarbershop &&
+      barbershop.id !== previousBarbershop.id
+    ) {
       setTotalPayment(0);
-      setIsSelected({});
+      setSelectedServiceId(null);
     }
     setPreviousBarbershop(barbershop);
   }, [barbershop, previousBarbershop]);
 
-  const handleCheckbox = (service_id, service_name, price) => {
-    setIsSelected((prevState) => {
-      const updatedSelection = {
-        ...prevState,
-        [service_id]: !prevState[service_id]
-          ? { service_name, price }
-          : undefined,
-      };
+  const radioButtons = useMemo(() => {
+    if (
+      !barbershop ||
+      !barbershop.services ||
+      !Array.isArray(barbershop.services)
+    ) {
+      console.warn("Barbershop services are not available or not an array");
+      return [];
+    }
 
-      const isSelectedNow = !prevState[service_id];
-      if (isSelectedNow) {
-        setTotalPayment((prevTotal) => prevTotal + price);
-      } else if(isSelectedNow===0){
-        setTotalPayment(0);
-      } else {
-        setTotalPayment((prevTotal) => prevTotal - price);
-      }
-      return updatedSelection;
-    });
+    return barbershop.services.map((service) => ({
+      id: service.service_id || "no-id",
+      label: service.service_name || "No Service Name",
+      value: service.service_id || "no-id", // Ensure value matches the id
+      price: service.price || 0,
+    }));
+  }, [barbershop]);
+
+  const handleServiceChange = (id) => {
+    const selectedService = radioButtons.find((service) => service.id === id);
+    if (selectedService) {
+      setSelectedServiceId(id);
+      setTotalPayment(selectedService.price);
+    }
   };
 
   const onRefresh = () => {
     setRefreshing(true);
-    setIsSelected({});
+    setSelectedServiceId(null);
     setTotalPayment(0);
     setTimeout(() => {
       setRefreshing(false);
@@ -126,11 +133,8 @@ export default function AppointmentScreen({ route, navigation }) {
   };
 
   const saveBookingData = async () => {
-    if (
-      Object.keys(isSelected).length === 0 ||
-      !Object.values(isSelected).some((value) => value)
-    ) {
-      alert("Please select at least one service.");
+    if (!selectedServiceId) {
+      alert("Please select a service.");
       return;
     }
 
@@ -144,17 +148,18 @@ export default function AppointmentScreen({ route, navigation }) {
       return;
     }
 
-    const selectedServices = Object.keys(isSelected)
-      .filter((key) => isSelected[key])
-      .map((service_id) => ({
-        id: service_id,
-        name: isSelected[service_id].service_name,
-        price: isSelected[service_id].price,
-      }));
-
+    const selectedService = radioButtons.find(
+      (service) => service.id === selectedServiceId
+    );
     const bookingData = {
       barbershop: barbershop,
-      services: selectedServices,
+      services: [
+        {
+          id: selectedServiceId,
+          name: selectedService.label,
+          price: selectedService.price,
+        },
+      ],
       booking_date: date.toLocaleDateString(),
       booking_time: selectedTime,
       totalPayment: totalPayment,
@@ -174,7 +179,7 @@ export default function AppointmentScreen({ route, navigation }) {
     return (
       <SafeAreaView>
         <View className="h-screen items-center bg-zinc-900">
-          <Text className="text-zinc-200 font-bold text-lg my-auto">
+          <Text className="text-zinc-200 font-bold text-base my-auto">
             No Barbershop Data Available
           </Text>
         </View>
@@ -198,9 +203,7 @@ export default function AppointmentScreen({ route, navigation }) {
               >
                 <Ionicons name="arrow-back" size={20} color="white" />
               </TouchableOpacity>
-              <Text className="text-zinc-100 font-bold text-lg">  
-                Back
-              </Text>
+              <Text className="text-zinc-100 font-bold text-base">Back</Text>
             </View>
           </View>
           {/* Barbershop Header */}
@@ -225,22 +228,20 @@ export default function AppointmentScreen({ route, navigation }) {
                   style={{ resizeMode: "cover", opacity: 0.9 }}
                 />
                 <View className="ml-4">
-                  <Text className="text-zinc-100 font-bold text-xl">
+                  <Text className="text-zinc-100 font-bold text-lg">
                     {barbershop.name || "No Name Available"}
                   </Text>
                   <View className="mt-1">
                     {barbershop.operational_hours.length > 0 ? (
                       barbershop.operational_hours.map((hour, index) => (
-                        <Text key={index} className="text-zinc-300 text-sm">
+                        <Text key={index} className="text-zinc-300 text-xs">
                           {toTitleCase(hour.day)}:{" "}
                           {hour.opening_time.substring(0, 5)} -{" "}
                           {hour.closing_time.substring(0, 5)}
                         </Text>
                       ))
                     ) : (
-                      <Text className="text-zinc-300 text-sm">
-                        No operational hours available
-                      </Text>
+                      <Text className="text-zinc-300 text-xs">Closed</Text>
                     )}
                   </View>
                 </View>
@@ -248,87 +249,70 @@ export default function AppointmentScreen({ route, navigation }) {
             </ImageBackground>
           </View>
 
-          {/* Service Selection */}
-          <View className="p-4 mt-4">
-            <Text className="text-zinc-400 font-bold text-lg mb-2">
-              Services
+          {/* Services Section */}
+          <View className=" mt-4 p-4 ">
+            <Text className="text-zinc-400 font-bold text-base mb-5 ml-1">
+              Select Service
             </Text>
-            <View className="bg-zinc-700 rounded-lg p-3">
-              {barbershop.services.length > 0 ? (
-                barbershop.services.map((service) => (
-                  <View
-                    key={service.service_id}
-                    className="flex-row justify-between items-center border-b border-zinc-600 py-2"
-                  >
-                    <CheckBox
-                      checked={isSelected[service.service_id]}
-                      onPress={() =>
-                        handleCheckbox(
-                          service.service_id,
-                          service.service_name,
-                          service.price
-                        )
-                      }
-                      containerStyle={{ backgroundColor: "transparent" }}
-                    />
-                    <Text className="text-zinc-200 font-bold">
-                      {service.service_name}
-                    </Text>
-                    <Text className="text-zinc-300">Rp.{service.price}</Text>
-                  </View>
-                ))
-              ) : (
-                <Text className="text-zinc-300">No services available</Text>
-              )}
+            <View className="flex-col bg-zinc-700 rounded-lg">
+              {radioButtons.map(({ id, label, price }) => (
+                <TouchableOpacity
+                  key={id}
+                  onPress={() => handleServiceChange(id)}
+                  className={`flex flex-col items-center p-3 rounded-lg mt-2 mb-4 ${
+                    selectedServiceId === id ? "bg-zinc-800" : "bg-zinc-600"
+                  }`}
+                >
+                  <Text className="text-zinc-100 font-bold text-base">
+                    {label}
+                  </Text>
+                  <Text className="text-zinc-300 text-sm">
+                    Rp.{price.toFixed(2)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
 
-          {/* Date & Time Selection */}
+          {/* Date and Time Section */}
           <View className="p-4">
-            <Text className="text-zinc-400 font-bold text-lg mb-2">
-              Booking Time
-            </Text>
-            <View className="flex flex-col bg-zinc-700 p-3 rounded-lg">
-              <View className="flex flex-row items-center mb-3 justify-between">
-                <Text className="text-zinc-200">Date</Text>
-                <View className="bg-zinc-800 rounded-lg p-3">
-                  <TouchableOpacity onPress={showDatepicker}>
-                    <Text className="text-zinc-100 ml-2">{formattedDate}</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View className="flex flex-row items-center justify-between">
-                <Text className="text-zinc-200 w-1/5">Time</Text>
-                <View className="flex-1 bg-zinc-800 rounded-lg">
-                  <Picker
-                    selectedValue={selectedTime}
-                    onValueChange={(itemValue) => setSelectedTime(itemValue)}
-                    style={{ color: "#e4e4e7",width: "100%", height: 50 }}
-                  >
-                    {availableTimes.map((time) => (
-                      <Picker.Item key={time} label={time} value={time} />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
+            <TouchableOpacity
+              onPress={showDatepicker}
+              className="mb-3 border border-zinc-500 rounded-lg p-3"
+            >
+              <Text className="text-zinc-100 font-bold text-base">
+                Date: {formattedDate}
+              </Text>
+            </TouchableOpacity>
+            <View className="border border-zinc-500 rounded-lg p-2">
+              <Picker
+                selectedValue={selectedTime}
+                onValueChange={(itemValue) => setSelectedTime(itemValue)}
+                mode="dropdown"
+                style={{ color: "white" }}
+              >
+                {availableTimes.map((time, index) => (
+                  <Picker.Item key={index} label={time} value={time} />
+                ))}
+              </Picker>
             </View>
           </View>
 
-          {/* Total Payment */}
+          {/* Total Payment Section */}
           <View className="p-4">
-            <Text className="text-zinc-400 font-bold text-lg">
-              Total Payment: Rp.{totalPayment}
+            <Text className="text-zinc-100 font-bold text-lg">
+              Total Payment: Rp.{totalPayment.toFixed(2)}
             </Text>
           </View>
 
           {/* Save Button */}
           <View className="p-4">
             <TouchableOpacity
-              className="bg-zinc-200 py-3 rounded-lg"
               onPress={saveBookingData}
+              className="bg-zinc-200 p-3 rounded-lg items-center"
             >
-              <Text className="text-zinc-900 text-center font-bold">
-                Continue
+              <Text className="text-zinc-900 font-bold text-base">
+                Save Booking
               </Text>
             </TouchableOpacity>
           </View>
@@ -337,4 +321,3 @@ export default function AppointmentScreen({ route, navigation }) {
     </SafeAreaView>
   );
 }
-

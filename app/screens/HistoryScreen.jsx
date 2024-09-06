@@ -14,6 +14,7 @@ const HistoryScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
   const fetchDataBooking = async () => {
     try {
@@ -30,8 +31,8 @@ const HistoryScreen = ({ navigation }) => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchDataBooking(); // Memuat ulang data
-    setRefreshing(false); // Menonaktifkan indikator refresh
+    await fetchDataBooking(); 
+    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -39,9 +40,19 @@ const HistoryScreen = ({ navigation }) => {
   }, []);
 
   const handleViewDetail = (bookingId) => {
-    // Arahkan ke halaman detail dengan parameter bookingId
     navigation.navigate("DetailsBooking", { bookingId });
   };
+
+  const filterBookings = (status) => {
+    setSelectedStatus(status);
+  };
+
+  console.log("Status:", selectedStatus);
+
+  const filteredBookings =
+    selectedStatus === "All"
+      ? listBooking
+      : listBooking.filter((booking) => booking.status === selectedStatus);
 
   return (
     <SafeAreaView className="flex-1">
@@ -54,16 +65,49 @@ const HistoryScreen = ({ navigation }) => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          {/* Header */}
           <View className="bg-zinc-800 p-4 rounded-lg mb-4">
             <Text className="text-zinc-200 font-bold text-xl">History</Text>
             <View className="border-b border-zinc-600 my-2"></View>
+
+            {/* Filter Status */}
+            <View className="flex-row justify-around mb-4">
+              <TouchableOpacity
+                style={{ borderRadius: 8, width: 50,height: 40 }}
+                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "All" ? "bg-zinc-600" : ""}`}
+                onPress={() => filterBookings("All")}
+              >
+                <Text className="text-zinc-200">All</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ borderRadius: 8, width: 60,height: 40 }}
+                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "pending" ? "bg-zinc-600" : ""}`}
+                onPress={() => filterBookings("Pending")}
+              >
+                <Text className="text-zinc-200 ">Pending</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ borderRadius: 8, width: 70,height: 40 }}
+                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "confirmed" ? "bg-zinc-600" : ""}`}
+                onPress={() => filterBookings("Confirmed")}
+              >
+                <Text className="text-zinc-200">Confirmed</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Hasil Filter */}
+            {/* <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-zinc-200 text-sm">
+                {`Showing ${filteredBookings.length} ${
+                  filteredBookings.length === 1 ? "booking" : "bookings"
+                } for status: ${selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1)}`}
+              </Text>
+            </View> */}
           </View>
 
           {/* List Booking */}
           <View className="space-y-4">
-            {listBooking && listBooking.length > 0 ? (
-              listBooking.map((booking) => (
+            {filteredBookings && filteredBookings.length > 0 ? (
+              filteredBookings.map((booking) => (
                 <View
                   key={booking.booking_id}
                   className="bg-zinc-700 p-4 rounded-lg space-y-2"
@@ -78,7 +122,6 @@ const HistoryScreen = ({ navigation }) => {
                     Date: {moment(booking.bookingDate).format("MMMM Do YYYY, HH:mm")}
                   </Text>
 
-                  {/* Layanan yang Dipesan */}
                   <View className="space-y-1">
                     {booking.services.map((service) => (
                       <View
@@ -99,7 +142,6 @@ const HistoryScreen = ({ navigation }) => {
                     Status: {booking.status}
                   </Text>
 
-                  {/* Button View Detail */}
                   <TouchableOpacity
                     onPress={() => handleViewDetail(booking.booking_id)}
                     className="bg-zinc-200 p-2 mt-2 rounded-lg"
