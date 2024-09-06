@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
-  Ionicons,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
-import { Image, ScrollView, Text, TouchableOpacity, View, Modal, Button, Linking } from "react-native";
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  Modal,
+  Button,
+  Linking,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import axiosInstance from "../service/axios";
@@ -41,12 +47,11 @@ export const ReviewScreen = ({ navigation }) => {
       const response = await axiosInstance.post("/bookings", bookingValues, {
         headers: {
           Authorization: `Bearer ${user.token}`,
-        }
+        },
       });
 
-     
       // Handle payment and navigate to Home
-      await handlePayment(response.data.data.booking_id);
+      handlePayment(response.data.data.midtransPaymentUrl);
 
       console.log("Booking successful");
     } catch (error) {
@@ -54,32 +59,16 @@ export const ReviewScreen = ({ navigation }) => {
     }
   };
 
-  const handlePayment = async (bookingId) => {
-    try {
-      const paymentData = {
-        booking_id: bookingId,
-        payment_method: "BANK_TRANSFER",
-        transaction_date: new Date().getTime(), // current timestamp
-      };
+  const handlePayment = (link) => {
+    // Open payment URL
+    Linking.openURL(link);
 
-      const response = await axiosInstance.post("/payments", paymentData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        }
-      });
+    // Navigate to Home screen after payment URL is opened
+    setTimeout(() => {
+      navigation.navigate("Home");
+    }, 2000); // Delay to allow URL to open
 
-      // Open payment URL
-      Linking.openURL(response.data.data.midtrans_payment_url);
-
-      // Navigate to Home screen after payment URL is opened
-      setTimeout(() => {
-        navigation.navigate("Home");
-      }, 2000); // Delay to allow URL to open
-
-      console.log("Payment successful", response.data.data);
-    } catch (error) {
-      console.error(error.response.data.message);
-    }
+    console.log("Payment successful");
   };
 
   return (
@@ -218,13 +207,22 @@ export const ReviewScreen = ({ navigation }) => {
         <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
           <View className="bg-white p-4 rounded-md w-80">
             <Text className="text-lg font-bold mb-4">Confirm Booking</Text>
-            <Text className="mb-4">Are you sure you want to book this appointment?</Text>
+            <Text className="mb-4">
+              Are you sure you want to book this appointment?
+            </Text>
             <View className="flex-row justify-between">
-              <Button title="Cancel" onPress={() => setModalVisible(false)} color={"red"} />
-              <Button title="Confirm" onPress={() => {
-                handleBooking();
-                setModalVisible(false);
-              }} />
+              <Button
+                title="Cancel"
+                onPress={() => setModalVisible(false)}
+                color={"red"}
+              />
+              <Button
+                title="Confirm"
+                onPress={() => {
+                  handleBooking();
+                  setModalVisible(false);
+                }}
+              />
             </View>
           </View>
         </View>
