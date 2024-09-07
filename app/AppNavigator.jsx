@@ -18,25 +18,25 @@ import PrivateScreen from "./screens/PrivateScreen";
 import NotificationScreen from "./screens/NotificationScreen";
 import AppointmentScreen from "./screens/AppointmentScreen";
 import DetailsBookingScreen from "./screens/DetailsBookingScreen";
+import WelcomeScreen from "./screens/WelcomeScreen";
+import WelcomeScreen2 from "./screens/WelcomeScreen2";
+import WelcomeScreen3 from "./screens/WelcomeScreen3";
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
   const [loading, setLoading] = useState(true);
-  const user = useSelector((state) => state.user.loggedInUser);
-  const dispatch = useDispatch();
+  const [user, setUser] = useState(null);
 
   const checkLoggedInUser = async () => {
     try {
       const loggedInUser = await AsyncStorage.getItem("loggedInUser");
-      if (loggedInUser) {
-        // Parse the logged-in user data
-        const userData = JSON.parse(loggedInUser);
-        // Dispatch login action
-        dispatch(login(userData));
-      }
+      setUser(JSON.parse(loggedInUser));
     } catch (error) {
-      console.error("Failed to load user data from AsyncStorage:", error.message);
+      console.error(
+        "Failed to load user data from AsyncStorage:",
+        error.message
+      );
     } finally {
       setLoading(false);
     }
@@ -44,22 +44,31 @@ const AppNavigator = () => {
 
   useEffect(() => {
     checkLoggedInUser();
-  }, [dispatch]);
+  }, []);
 
   if (loading) {
     return (
-      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <ActivityIndicator size="large" />
-        <Text>Loading...</Text>
       </View>
     );
   }
 
   return (
     <Stack.Navigator
-      initialRouteName={user?.id ? "Tab" : "Login"}
+      initialRouteName={user ? "Tab" : "Welcome"}
       screenOptions={{ headerShown: false }}
     >
+      <Stack.Screen name="Welcome" component={WelcomeScreen} />
+      <Stack.Screen name="Welcome2" component={WelcomeScreen2} />
+      <Stack.Screen name="Welcome3" component={WelcomeScreen3} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
