@@ -31,6 +31,59 @@ const formatPrice = (price) => {
   }).format(price);
 };
 
+const validateTime = (selectedTimeString, operationalHours) => {
+  // Ensure operationalHours is an array
+  if (!Array.isArray(operationalHours)) {
+    console.warn("Operational hours data is not an array.");
+    return false;
+  }
+
+  const [selectedHour, selectedMinute] = selectedTimeString
+    .split(":")
+    .map(Number);
+
+  for (let hour of operationalHours) {
+    const { day, opening_time, closing_time } = hour;
+    if (!opening_time || !closing_time) {
+      console.warn(`Opening time or closing time missing for day: ${day}`);
+      continue;
+    }
+
+    const [openHour, openMinute] = opening_time.split(":").map(Number);
+    const [closeHour, closeMinute] = closing_time.split(":").map(Number);
+
+    if (
+      isWithinRange(
+        selectedHour,
+        selectedMinute,
+        openHour,
+        openMinute,
+        closeHour,
+        closeMinute
+      )
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const isWithinRange = (
+  hour,
+  minute,
+  openHour,
+  openMinute,
+  closeHour,
+  closeMinute
+) => {
+  const selectedTime = hour * 60 + minute;
+  const openingTime = openHour * 60 + openMinute;
+  const closingTime = closeHour * 60 + closeMinute;
+
+  return selectedTime >= openingTime && selectedTime <= closingTime;
+};
+
 export default function AppointmentScreen({ route, navigation }) {
   const { barbershop } = route.params || {};
   const [selectedServiceId, setSelectedServiceId] = useState(null);
@@ -100,6 +153,7 @@ export default function AppointmentScreen({ route, navigation }) {
           value: date,
           mode: "date",
           is24Hour: true,
+          minimumDate: new Date(),
           onChange: (event, selectedDate) => {
             if (event.type === "dismissed") resolve({ action: "dismissed" });
             const date = selectedDate || new Date();
@@ -152,7 +206,14 @@ export default function AppointmentScreen({ route, navigation }) {
         const formattedTime = `${hour.toString().padStart(2, "0")}:${minute
           .toString()
           .padStart(2, "0")}`;
-        setSelectedTime(formattedTime);
+        if (validateTime(formattedTime, barbershop.operational_hours)) {
+          setSelectedTime(formattedTime);
+        } else {
+          Alert.alert(
+            "Invalid Time",
+            `Time ${formattedTime} is not within operational hours barbershop.`
+          );
+        }
       }
     } catch (error) {
       console.error("Error selecting time:", error);
