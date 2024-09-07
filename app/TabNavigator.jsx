@@ -53,7 +53,7 @@ const TabNavigator = () => {
                 component={HistoryScreen}
                 options={{
                     tabBarIcon: ({ focused, color, size }) => (
-                        <Fontisto name="history" size={size} color={color} />
+                        <Ionicons name="calendar-outline" size={size} color={color} />
                     ),
                 }}
             />

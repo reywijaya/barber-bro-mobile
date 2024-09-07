@@ -11,9 +11,13 @@ import {
   Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../service/axios";
 import UserAvatar from "react-native-user-avatar";
+import {
+  setListBookingById,
+  setListBookingUser,
+} from "../store/listBookingUser";
 
 const toTitleCase = (str) =>
   str
@@ -21,16 +25,24 @@ const toTitleCase = (str) =>
     .split(" ")
     .map((word) => word.replace(word[0], word[0].toUpperCase()))
     .join(" ");
-
+const formatPrice = (price) => {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 2,
+  }).format(price);
+};
 export const ReviewScreen = ({ navigation }) => {
   const userData = useSelector((state) => state.profileData.profileData);
   const user = useSelector((state) => state.user.loggedInUser);
+  // console.log("user", user);
   const dataBooking = useSelector((state) => state.appointment.appointments);
+  const dispatch = useDispatch();
 
   const [modalVisible, setModalVisible] = useState(false);
-  console.log(dataBooking.booking_date, dataBooking.booking_time);
+  // console.log(dataBooking.booking_date, dataBooking.booking_time);
   const [day, month, year] = dataBooking.booking_date.split("/").map(Number);
-  console.log(day, month, year);
+  // console.log(day, month, year);
   const formattedDate = new Date(year, month - 1, day);
 
   const idServices = dataBooking.services.map((service) => service.id);
@@ -40,6 +52,7 @@ export const ReviewScreen = ({ navigation }) => {
     booking_date: formattedDate.getTime(),
     booking_time: dataBooking.booking_time,
   };
+  // console.log("bookingValues", bookingValues);
 
   const handleBooking = async () => {
     try {
@@ -49,24 +62,25 @@ export const ReviewScreen = ({ navigation }) => {
           Authorization: `Bearer ${user.token}`,
         },
       });
+      console.log(response.data.data);
 
-      // Handle payment and navigate to Home
-      handlePayment(response.data.data.midtransPaymentUrl);
+      // Handle payment
+      handlePayment(response.data.data);
 
       console.log("Booking successful");
     } catch (error) {
-      console.error(error.response.data.message);
+      console.error(error.response.data);
     }
   };
 
-  const handlePayment = (link) => {
-    // Open payment URL
-    Linking.openURL(link);
+  const handlePayment = (data) => {
+    Linking.openURL(data.midtrans_payment_url);
 
-    // Navigate to Home screen after payment URL is opened
+    dispatch(setListBookingById(data));
+
     setTimeout(() => {
-      navigation.navigate("Home");
-    }, 2000); // Delay to allow URL to open
+      navigation.navigate("History");
+    }, 2000);
 
     console.log("Payment successful");
   };
@@ -123,7 +137,7 @@ export const ReviewScreen = ({ navigation }) => {
               {dataBooking.services.map((item) => (
                 <View className="flex-row justify-between my-1" key={item.id}>
                   <Text className="text-zinc-400 text-xs">{item.name}</Text>
-                  <Text className="text-zinc-400 text-xs">{item.price}</Text>
+                  <Text className="text-zinc-400 text-xs">{formatPrice(item.price)}</Text>
                 </View>
               ))}
             </View>
@@ -131,7 +145,7 @@ export const ReviewScreen = ({ navigation }) => {
             <View className="flex-row justify-between">
               <Text className="text-zinc-400">Total Payment</Text>
               <Text className="text-zinc-400 text-xs">
-                Rp. {dataBooking.totalPayment}
+                {formatPrice(dataBooking.totalPayment)}
               </Text>
             </View>
           </View>
@@ -191,10 +205,10 @@ export const ReviewScreen = ({ navigation }) => {
 
       {/* Booking Button */}
       <TouchableOpacity
-        className="bg-zinc-200 w-full p-3 items-center justify-center absolute bottom-0 right-0 left-0 rounded-md"
+        className="bg-zinc-200 w-full p-4 items-center justify-center absolute bottom-0 right-0 left-0 "
         onPress={() => setModalVisible(true)}
       >
-        <Text className="text-zinc-900 font-bold">Booking Now</Text>
+        <Text className="text-zinc-900 font-bold text-base">Booking Now</Text>
       </TouchableOpacity>
 
       {/* Confirmation Modal */}

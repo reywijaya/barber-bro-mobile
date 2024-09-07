@@ -20,6 +20,9 @@ export default function ProfileScreen({ navigation }) {
     dispatch({ type: "LOGOUT" });
     navigation.navigate("Login");
   };
+  const handleHistory = () => {
+    navigation.navigate("History");
+  };
 
   return (
     <SafeAreaView className="flex-1">
@@ -103,11 +106,13 @@ export default function ProfileScreen({ navigation }) {
           </View>
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-2">
-              <MaterialIcons name="history" size={25} color="#9ca3af" />
-              <Text className="text-gray-400 text-lg py-2">Book History</Text>
+              <Ionicons name="calendar-outline" size={24} color="#9ca3af" />
+              <Text className="text-gray-400 text-lg py-2">
+                Booking History
+              </Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#9ca3af" />
+              <Feather name="arrow-right" size={24} color="#9ca3af" onPress={handleHistory}/>
             </View>
           </View>
           <View className="h-[1px] bg-gray-700 my-2" />

@@ -31,21 +31,20 @@ const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch();
   const barbershopData = useSelector((state) => state.barbershops.barbershops);
+  // console.log("barbershopData", barbershopData);
   const user = useSelector((state) => state.user.loggedInUser);
   console.log("user", user);
-  const dataProfile=useSelector((state) => state.profileData.profileData);
-  console.log("dataProfile", dataProfile);
+  const dataProfile = useSelector((state) => state.profileData.profileData);
+  // console.log("dataProfile", dataProfile);
+  const fetchBarbershopData = async () => {
+    const data = await getBarbershop();
+    // console.log("data", data);
+    dispatch(getBarbershops(data));
+    getDataProfile(dispatch, user.token);
+  };
 
   useEffect(() => {
-    const fetchBarbershopData = async () => {
-      const data = await getBarbershop();
-      // console.log("data", data);
-      dispatch(getBarbershops(data));
-      getDataProfile(dispatch, user.token);
-    };
-
     fetchBarbershopData();
-    
 
     const loadUserData = async () => {
       try {
@@ -110,13 +109,12 @@ const HomeScreen = ({ navigation }) => {
         }
       >
         {filteredBarbershopData.map((item) => (
-          
           <View key={item.id} className="flex flex-col bg-black p-5">
             <View className="rounded-lg items-center">
               <ImageBackground
                 source={{
                   uri:
-                    "http://10.10.102.48:8080" +
+                    "http://10.10.102.48:8085" +
                     item.barbershop_profile_picture_id.path,
                 }}
                 style={{ height: 180, width: 280 }}

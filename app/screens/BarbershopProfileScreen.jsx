@@ -129,7 +129,7 @@ export default function BarbershopProfileScreen({ route, navigation }) {
               <Image
                 source={{
                   uri:
-                    "http://10.10.102.48:8080" +
+                    "http://10.10.102.48:8085" +
                     barbershop.barbershop_profile_picture_id.path,
                 }}
                 style={{ width: 90, height: 90 }}

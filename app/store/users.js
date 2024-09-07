@@ -11,9 +11,6 @@ const users = createSlice({
   reducers: {
     login(state, action) {
       state.loggedInUser = action.payload;
-
-      // Simpan data loggedInUser ke AsyncStorage
-      AsyncStorage.setItem('loggedInUser', JSON.stringify(state.loggedInUser));
     },
     logout(state) {
       state.loggedInUser = {};

@@ -11,7 +11,8 @@ const store= configureStore({
         barbershops: barbershopsReducer,
         profileData: profileDataReducer,
         appointment: appointmentReducer,
-        listBookingUser: listBookingUserReducer
+        listBookingUser: listBookingUserReducer,
+        
     }
 })
 

@@ -1,44 +1,50 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { TouchableOpacity, Image } from "react-native";
 import { ScrollView, View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import axiosInstance from "../service/axios";
+
+
+const formatPrice = (price) => {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 2,
+  }).format(price);
+};
+
+const toTitleCase = (str) =>
+  str.replace(/\w\S*/g, (txt) =>
+    txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+  );
 
 const DetailsBookingScreen = ({ route, navigation }) => {
-  const bookingData = {
-    booking_id: "1b91f513-0402-43b2-90c1-1637a69f162e",
-    customer: {
-      firstName: "Aditya Bayu",
-      surname: "Prabowo",
-      email: "Aditya@gmail.com",
-      phone: "088227661015",
-      address: "Jalan Topaz No 7",
-      about: "Strongers",
-      is_male: true,
-      date_of_birth: 1725348960000,
-    },
-    barber: {
-      name: "Prime Barber",
-      contact_number: "082134567890",
-      email: "barber1@example.com",
-      street_address: "Jl. Mawar No. 12",
-      city: "Jakarta",
-      state_province_region: "DKI Jakarta",
-      postal_zip_code: "10110",
-      country: "Indonesia",
-      description: "High-end barber services",
-    },
-    services: [
-      {
-        service_name: "Haircut",
-        price: 50000.0,
-      },
-    ],
-    bookingDate: 1725461728955,
-    bookingTime: "14:55",
-    status: "Pending",
-    totalPrice: 50000.0,
+  const { bookingId } = route.params;
+  const [bookingData, setBookingData] = useState({});
+
+  const fetchBookingData = async () => {
+    try {
+      const res = await axiosInstance.get(`/bookings/${bookingId}/update`);
+      setBookingData(res.data.data);
+    } catch (error) {
+      console.log("Error fetching booking data:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchBookingData();
+  }, []);
+
+  const {
+    barber,
+    customer,
+    services = [],
+    booking_date,
+    booking_time,
+    total_price,
+    status,
+  } = bookingData;
 
   return (
     <SafeAreaView className="flex-1">
@@ -49,109 +55,88 @@ const DetailsBookingScreen = ({ route, navigation }) => {
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
           <Text className="text-zinc-200 font-bold text-base ml-2">
-            Go Back
+            Booking Details
           </Text>
         </View>
 
         {/* Scrollable Content */}
-        <View className="flex-1 p-4">
-          <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
-            showsVerticalScrollIndicator={false}
-          >
-            <View className="bg-zinc-800 p-4 rounded-lg shadow-lg">
-              {/* Title */}
-              <Text className="text-xl font-bold text-white text-center mb-4">
-                Booking Details
+        <ScrollView className="p-4">
+          {/* Barbershop Information */}
+          {barber && (
+            <View className="mb-4 bg-zinc-800 p-4 rounded-lg">
+              <Image
+                source={{
+                  uri: `http://10.10.102.48:8085${barber.barbershop_profile_picture_id?.path || ""}`,
+                }}
+                className="w-full h-40 rounded-md mb-4"
+                style={{ resizeMode: "cover" }}
+              />
+              <Text className="text-white font-bold text-lg">
+                {barber.name}
               </Text>
-
-              {/* Customer Info */}
-              <View className="mb-4">
-                <Text className="text-base font-semibold text-zinc-300 mb-2">
-                  Customer Information
-                </Text>
-                <View className="border-t border-zinc-600 pt-2">
-                  <Text className="text-sm text-zinc-400 mb-1">
-                    Name: {bookingData.customer.firstName}{" "}
-                    {bookingData.customer.surname}
-                  </Text>
-                  <Text className="text-sm text-zinc-400 mb-1">
-                    Phone: {bookingData.customer.phone}
-                  </Text>
-                  <Text className="text-sm text-zinc-400 mb-1">
-                    Email: {bookingData.customer.email}
-                  </Text>
-                  <Text className="text-sm text-zinc-400">
-                    Address: {bookingData.customer.address}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Barber Info */}
-              <View className="mb-4">
-                <Text className="text-base font-semibold text-zinc-300 mb-2">
-                  Barber Information
-                </Text>
-                <View className="border-t border-zinc-600 pt-2">
-                  <Text className="text-sm text-zinc-400 mb-1">
-                    Name: {bookingData.barber.name}
-                  </Text>
-                  <Text className="text-sm text-zinc-400 mb-1">
-                    Phone: {bookingData.barber.contact_number}
-                  </Text>
-                  <Text className="text-sm text-zinc-400 mb-1">
-                    Email: {bookingData.barber.email}
-                  </Text>
-                  <Text className="text-sm text-zinc-400">
-                    Address: {bookingData.barber.street_address},{" "}
-                    {bookingData.barber.city}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Service Info */}
-              <View className="mb-4">
-                <Text className="text-base font-semibold text-zinc-300 mb-2">
-                  Service Information
-                </Text>
-                <View className="border-t border-zinc-600 pt-2">
-                  {bookingData.services.map((service, index) => (
-                    <View key={index} className="mb-2">
-                      <Text className="text-sm text-zinc-400">
-                        Service: {service.service_name}
-                      </Text>
-                      <Text className="text-sm text-zinc-400">
-                        Price: Rp{service.price.toLocaleString()}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-
-              {/* Booking Info */}
-              <View className="mb-4">
-                <Text className="text-base font-semibold text-zinc-300 mb-2">
-                  Booking Information
-                </Text>
-                <View className="border-t border-zinc-600 pt-2">
-                  <Text className="text-sm text-zinc-400 mb-1">
-                    Date:{" "}
-                    {new Date(bookingData.bookingDate).toLocaleDateString()}
-                  </Text>
-                  <Text className="text-sm text-zinc-400 mb-1">
-                    Time: {bookingData.bookingTime}
-                  </Text>
-                  <Text className="text-sm text-zinc-400 mb-1">
-                    Status Booking: {bookingData.status}
-                  </Text>
-                  <Text className="text-sm text-zinc-400">
-                    Total Price: Rp{bookingData.totalPrice.toLocaleString()}
-                  </Text>
-                </View>
-              </View>
+              <Text className="text-zinc-400 text-sm">
+                {barber.street_address}, {barber.city}
+              </Text>
+              <Text className="text-zinc-400 text-sm">
+                {barber.contact_number}
+              </Text>
             </View>
-          </ScrollView>
-        </View>
+          )}
+
+          {/* Booking Details */}
+          <View className="mb-4 bg-zinc-800 p-4 rounded-lg">
+            <Text className="text-white font-bold text-lg">Booking Details</Text>
+            <Text className="text-zinc-400 text-sm mt-2">
+              Date: {booking_date ? new Date(booking_date).toLocaleDateString() : "N/A"}
+            </Text>
+            <Text className="text-zinc-400 text-sm">
+              Time: {booking_time || "N/A"}
+            </Text>
+            <Text className="text-zinc-400 text-sm">
+              Status: {status ? toTitleCase(status) : "N/A"}
+            </Text>
+          </View>
+
+          {/* Customer Information */}
+          {customer && (
+            <View className="mb-4 bg-zinc-800 p-4 rounded-lg">
+              <Text className="text-white font-bold text-lg">
+                Customer Information
+              </Text>
+              <Text className="text-zinc-400 text-sm mt-2">
+                Name: {customer.firstName} {customer.surname}
+              </Text>
+              <Text className="text-zinc-400 text-sm">
+                Email: {customer.email}
+              </Text>
+              <Text className="text-zinc-400 text-sm">
+                Phone: {customer.phone}
+              </Text>
+            </View>
+          )}
+
+          {/* Services Information */}
+          {services.length > 0 && (
+            <View className="mb-4 bg-zinc-800 p-4 rounded-lg">
+              <Text className="text-white font-bold text-lg">Services</Text>
+              {services.map((service, index) => (
+                <Text key={index} className="text-zinc-400 text-sm mt-2">
+                  {service.service_name} - {formatPrice(service.price)}
+                </Text>
+              ))}
+            </View>
+          )}
+
+          {/* Total Price */}
+          {total_price && (
+            <View className="bg-zinc-800 p-4 rounded-lg mb-8">
+              <Text className="text-white font-bold text-lg">Total Price</Text>
+              <Text className="text-zinc-400 text-sm mt-2">
+                {formatPrice(total_price)}
+              </Text>
+            </View>
+          )}
+        </ScrollView>
       </View>
     </SafeAreaView>
   );

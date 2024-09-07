@@ -69,20 +69,18 @@ export const LoginScreen = ({ navigation }) => {
       }
       alert("Login successful");
 
-      if (rememberMe === true) {
-        await AsyncStorage.setItem(
-          "loggedInUser",
-          JSON.stringify({ email, rememberMe })
-        );
-      } else {
-        await AsyncStorage.removeItem("loggedInUser");
+      if (rememberMe===true) {
+        dispatch(login(response.data.data));
+        await AsyncStorage.setItem("loggedInUser", JSON.stringify(response.data.data));
+        navigation.navigate("Tab", {
+          screen: "Home",
+        })
+      } else if (rememberMe===false) {
+        dispatch(login(response.data.data));
+        navigation.navigate("Tab", {
+          screen: "Home",
+        })
       }
-      
-      dispatch(login(response.data.data));
-
-      navigation.navigate("Tab", {
-        screen: "Home",
-      });
     } catch (error) {
       alert("Login failed, please check your email and password");
       console.log(error.response.data);

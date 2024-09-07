@@ -1,21 +1,27 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text, View, RefreshControl, TouchableOpacity } from "react-native";
+import { ScrollView, Text, View, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../service/axios";
 import { setListBookingUser } from "../store/listBookingUser";
 import moment from "moment";
+import { TouchableOpacity } from "react-native";
+const toTitleCase = (str) => {
+  return str.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+  );
+};
 
 const HistoryScreen = ({ navigation }) => {
   const user = useSelector((state) => state.user.loggedInUser);
-  const listBooking = useSelector(
-    (state) => state.listBookingUser.listBookingUser
-  );
+  const listBooking = useSelector((state) => state.listBookingUser.listBookingUser);
   const dispatch = useDispatch();
-  
-  const [refreshing, setRefreshing] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("all");
 
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("All");
+
+  // Fetch data bookings from API
   const fetchDataBooking = async () => {
     try {
       const response = await axiosInstance.get("/bookings/current", {
@@ -24,19 +30,46 @@ const HistoryScreen = ({ navigation }) => {
         },
       });
       dispatch(setListBookingUser(response.data.data));
+      // Auto update the status of each booking
+      autoUpdateBookingStatus(response.data.data);
     } catch (error) {
       console.log(error);
     }
   };
 
+  // Auto update status for each booking
+  const autoUpdateBookingStatus = async (bookings) => {
+    try {
+      // Loop through all bookings and update their status
+      for (const booking of bookings) {
+        const response = await axiosInstance.get(`/bookings/${booking.booking_id}/update`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+        // console.log(`Status updated for booking ${booking.booking_id}:`, response.data);
+      }
+      // After updating, fetch the latest data
+      await fetchDataBooking();
+    } catch (error) {
+      console.error("Failed to auto-update booking status:", error);
+    }
+  };
+
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchDataBooking(); 
+    await fetchDataBooking();
     setRefreshing(false);
   };
 
   useEffect(() => {
     fetchDataBooking();
+    // Optional: Set interval to auto-refresh and update status every 5 minutes
+    const intervalId = setInterval(() => {
+      fetchDataBooking();
+    }, 300000); // 300,000 ms = 5 minutes
+
+    return () => clearInterval(intervalId); // Clear the interval on component unmount
   }, []);
 
   const handleViewDetail = (bookingId) => {
@@ -47,12 +80,10 @@ const HistoryScreen = ({ navigation }) => {
     setSelectedStatus(status);
   };
 
-  console.log("Status:", selectedStatus);
-
   const filteredBookings =
     selectedStatus === "All"
       ? listBooking
-      : listBooking.filter((booking) => booking.status === selectedStatus);
+      : listBooking.filter((booking) => toTitleCase(booking.status) === selectedStatus);
 
   return (
     <SafeAreaView className="flex-1">
@@ -72,36 +103,34 @@ const HistoryScreen = ({ navigation }) => {
             {/* Filter Status */}
             <View className="flex-row justify-around mb-4">
               <TouchableOpacity
-                style={{ borderRadius: 8, width: 50,height: 40 }}
+                style={{ borderRadius: 8, width: 50, height: 40 }}
                 className={`items-center justify-center bg-zinc-700 ${selectedStatus === "All" ? "bg-zinc-600" : ""}`}
                 onPress={() => filterBookings("All")}
               >
                 <Text className="text-zinc-200">All</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={{ borderRadius: 8, width: 60,height: 40 }}
-                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "pending" ? "bg-zinc-600" : ""}`}
+                style={{ borderRadius: 8, width: 60, height: 40 }}
+                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "Pending" ? "bg-zinc-600" : ""}`}
                 onPress={() => filterBookings("Pending")}
               >
-                <Text className="text-zinc-200 ">Pending</Text>
+                <Text className="text-zinc-200">Pending</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={{ borderRadius: 8, width: 70,height: 40 }}
-                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "confirmed" ? "bg-zinc-600" : ""}`}
-                onPress={() => filterBookings("Confirmed")}
+                style={{ borderRadius: 8, width: 75, height: 40 }}
+                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "Settlement" ? "bg-zinc-600" : ""}`}
+                onPress={() => filterBookings("Settlement")}
               >
-                <Text className="text-zinc-200">Confirmed</Text>
+                <Text className="text-zinc-200">Settlement</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ borderRadius: 8, width: 75, height: 40 }}
+                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "Completed" ? "bg-zinc-600" : ""}`}
+                onPress={() => filterBookings("Completed")}
+              >
+                <Text className="text-zinc-200">Completed</Text>
               </TouchableOpacity>
             </View>
-
-            {/* Hasil Filter */}
-            {/* <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-zinc-200 text-sm">
-                {`Showing ${filteredBookings.length} ${
-                  filteredBookings.length === 1 ? "booking" : "bookings"
-                } for status: ${selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1)}`}
-              </Text>
-            </View> */}
           </View>
 
           {/* List Booking */}
@@ -139,17 +168,19 @@ const HistoryScreen = ({ navigation }) => {
                   </View>
 
                   <Text className="text-zinc-400 text-sm">
-                    Status: {booking.status}
+                    Status Booking: {toTitleCase(booking.status)}
                   </Text>
 
-                  <TouchableOpacity
-                    onPress={() => handleViewDetail(booking.booking_id)}
-                    className="bg-zinc-200 p-2 mt-2 rounded-lg"
-                  >
-                    <Text className="text-zinc-900 text-center font-semibold">
-                      View Detail
-                    </Text>
-                  </TouchableOpacity>
+                  <View className="flex-row justify-between mt-2">
+                    <TouchableOpacity
+                      onPress={() => handleViewDetail(booking.booking_id)}
+                      className="bg-zinc-200 p-2 rounded-lg"
+                    >
+                      <Text className="text-zinc-900 text-center font-semibold">
+                        View Detail
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               ))
             ) : (
