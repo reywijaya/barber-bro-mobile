@@ -12,12 +12,12 @@ import {
 import { SearchBar } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getBarbershop } from "../service/fetchDataBarberShop";
 import { getBarbershops } from "../store/barbershops";
 import { getDataProfile } from "../service/fetchDataProfile";
+import axiosInstance from "../service/axios";
 
 const toTitleCase = (str) => {
   return str.replace(
@@ -30,36 +30,28 @@ const HomeScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch();
-  const barbershopData = useSelector((state) => state.barbershops.barbershops);
-  // console.log("barbershopData", barbershopData);
   const user = useSelector((state) => state.user.loggedInUser);
-  console.log("user", user);
   const dataProfile = useSelector((state) => state.profileData.profileData);
-  // console.log("dataProfile", dataProfile);
+  const [dataNearbyBarbershop, setDataNearbyBarbershop] = useState([]);
+  console.log("nearbyBarbershop", dataNearbyBarbershop);
+
   const fetchBarbershopData = async () => {
     const data = await getBarbershop();
-    // console.log("data", data);
     dispatch(getBarbershops(data));
     getDataProfile(dispatch, user.token);
   };
 
-  useEffect(() => {
-    fetchBarbershopData();
-
-    const loadUserData = async () => {
-      try {
-        const storedUserData = await AsyncStorage.getItem("loggedInUser");
-        if (storedUserData) {
-          const userData = JSON.parse(storedUserData);
-          Alert.alert("Welcome", `Welcome back, ${userData.email}!`);
-        }
-      } catch (error) {
-        console.error("Failed to load user data from AsyncStorage:", error);
+  const loadUserData = async () => {
+    try {
+      const storedUserData = await AsyncStorage.getItem("loggedInUser");
+      if (storedUserData) {
+        const userData = JSON.parse(storedUserData);
+        Alert.alert("Welcome", `Welcome back, ${userData.email}!`);
       }
-    };
-
-    loadUserData();
-  }, [dispatch]);
+    } catch (error) {
+      console.error("Failed to load user data from AsyncStorage:", error);
+    }
+  };
 
   const updateSearch = (search) => {
     setSearch(search);
@@ -67,22 +59,39 @@ const HomeScreen = ({ navigation }) => {
 
   const filteredBarbershopData = useMemo(() => {
     if (!search) {
-      return barbershopData;
+      return dataNearbyBarbershop;
     }
 
-    return barbershopData.filter((item) =>
+    return dataNearbyBarbershop.filter((item) =>
       item.name.toLowerCase().includes(search.toLowerCase())
     );
-  }, [search, barbershopData]);
-  // console.log("filteredBarbershopData", filteredBarbershopData);
+  }, [search, dataNearbyBarbershop]);
+
+  const latitude = -7.93476752;
+  const longitude = 112.60261667;
+
+  const apiNearbyBarbershop = async (latitude, longitude) => {
+    try {
+      const res = await axiosInstance.get(
+        `/barbers/nearby?latitude=${latitude}&longitude=${longitude}`
+      );
+      setDataNearbyBarbershop(res.data.data);
+    } catch (error) {
+      console.log("Error fetching nearby barbershops:", error.response.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchBarbershopData();
+    loadUserData();
+    apiNearbyBarbershop(latitude, longitude);
+  }, [dispatch]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     const data = await getBarbershop();
-    // console.log("data", data);
     dispatch(getBarbershops(data));
     getDataProfile(dispatch, user.token);
-
     setRefreshing(false);
   };
 
@@ -132,7 +141,7 @@ const HomeScreen = ({ navigation }) => {
                       className="text-white text-xs font-bold"
                       style={{ opacity: 0.9 }}
                     >
-                      4.5
+                      {item.average_rating}
                     </Text>
                   </View>
                   <View className="flex flex-row gap-1">
@@ -146,7 +155,7 @@ const HomeScreen = ({ navigation }) => {
                       className="text-white text-xs font-bold"
                       style={{ opacity: 0.9 }}
                     >
-                      0.2 km
+                      {item.distance_km.toFixed(1)} km
                     </Text>
                   </View>
                 </View>
