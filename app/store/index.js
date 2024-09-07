@@ -6,6 +6,10 @@ import appointmentReducer from "./appointment";
 import listBookingUserReducer from "./listBookingUser";
 
 const store= configureStore({
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        immutableCheck: false,
+        serializableCheck: false,
+      }),
     reducer:{
         user: userReducer,
         barbershops: barbershopsReducer,

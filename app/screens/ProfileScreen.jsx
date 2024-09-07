@@ -14,7 +14,8 @@ import UserAvatar from "react-native-user-avatar";
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser);
-
+  const profile = useSelector((state) => state.profileData.profileData);
+  console.log(profile);
   const handleLogout = async () => {
     await AsyncStorage.removeItem("loggedInUser");
     dispatch({ type: "LOGOUT" });
@@ -29,13 +30,13 @@ export default function ProfileScreen({ navigation }) {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 bg-black p-4">
           <View className="flex-row gap-6 py-4">
-            <UserAvatar size={60} name={user.email} bgColor="#9ca3af" />
+            <UserAvatar size={60} name={profile.firstName||"User"} bgColor="#9ca3af" />
             <View>
-              <Text className="text-white font-bold text-2xl">
-                {user.email}
+              <Text className="text-white font-bold text-xl">
+                {profile.firstName || "User"}{" "}{profile.surname || ""}
               </Text>
               <Text className="text-gray-400 text-xs">
-                you may think that the sun don't shine
+                {profile.about || "No bio"}
               </Text>
             </View>
           </View>

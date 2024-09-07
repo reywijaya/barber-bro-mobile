@@ -110,26 +110,27 @@ const HomeScreen = ({ navigation }) => {
 
     return filteredData;
   }, [search, dataNearbyBarbershop, sortDistance, sortRating]);
+ // Latitude and longitude of Enigmacamp Malang
+ const latitude = -7.93476752;
+ const longitude = 112.60261667;
 
-  const latitude = -7.93476752;
-  const longitude = 112.60261667;
+ const apiNearbyBarbershop = async (latitude, longitude) => {
+   try {
+     const res = await axiosInstance.get(
+       `/barbers/nearby?latitude=${latitude}&longitude=${longitude}`
+     );
+     setDataNearbyBarbershop(res.data.data);
+   } catch (error) {
+     console.log("Error fetching nearby barbershops:", error.response.data);
+   }
+ };
 
-  const apiNearbyBarbershop = async (latitude, longitude) => {
-    try {
-      const res = await axiosInstance.get(
-        `/barbers/nearby?latitude=${latitude}&longitude=${longitude}`
-      );
-      setDataNearbyBarbershop(res.data.data);
-    } catch (error) {
-      console.log("Error fetching nearby barbershops:", error.response.data);
-    }
-  };
-
-  useEffect(() => {
-    fetchBarbershopData();
-    loadUserData();
-    apiNearbyBarbershop(latitude, longitude);
-  }, [dispatch]);
+ useEffect(() => {
+   fetchBarbershopData();
+   loadUserData();
+   apiNearbyBarbershop(latitude, longitude);
+ }, [dispatch]);
+ 
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -180,7 +181,11 @@ const HomeScreen = ({ navigation }) => {
           className="bg-zinc-700 px-4 py-2 rounded-lg flex-row items-center"
         >
           <FontAwesome6
-            name={sortRating === "highest" ? "arrow-down-wide-short" : "arrow-up-wide-short"}
+            name={
+              sortRating === "highest"
+                ? "arrow-down-wide-short"
+                : "arrow-up-wide-short"
+            }
             size={20}
             color="white"
             style={{ marginRight: 8 }}

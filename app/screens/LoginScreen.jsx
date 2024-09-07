@@ -27,20 +27,20 @@ export const LoginScreen = ({ navigation }) => {
     useTogglePasswordVisibility();
   // console.log(rememberMe);
 
-  useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        const userData = await AsyncStorage.getItem("loggedInUser");
-        if (userData) {
-          const { email, rememberMe } = JSON.parse(userData);
-          setEmail(email);
-          setRememberMe(rememberMe);
-        }
-      } catch (error) {
-        console.error("Failed to load user data from AsyncStorage:", error);
+  const loadUserData = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("loggedInUser");
+      if (userData) {
+        const { email, rememberMe } = JSON.parse(userData);
+        setEmail(email);
+        setRememberMe(rememberMe);
       }
-    };
+    } catch (error) {
+      console.error("Failed to load user data from AsyncStorage:", error);
+    }
+  };
 
+  useEffect(() => {
     loadUserData();
   }, []);
 
@@ -63,23 +63,27 @@ export const LoginScreen = ({ navigation }) => {
         email,
         password,
       });
+      console.log("response",response.data.data);
       if (!response.data.data) {
         alert("Login failed, please check your email and password");
         return;
       }
       alert("Login successful");
 
-      if (rememberMe===true) {
+      if (rememberMe === true) {
         dispatch(login(response.data.data));
-        await AsyncStorage.setItem("loggedInUser", JSON.stringify(response.data.data));
+        await AsyncStorage.setItem(
+          "loggedInUser",
+          JSON.stringify(response.data.data)
+        );
         navigation.navigate("Tab", {
           screen: "Home",
-        })
-      } else if (rememberMe===false) {
+        });
+      } else if (rememberMe === false) {
         dispatch(login(response.data.data));
         navigation.navigate("Tab", {
           screen: "Home",
-        })
+        });
       }
     } catch (error) {
       alert("Login failed, please check your email and password");

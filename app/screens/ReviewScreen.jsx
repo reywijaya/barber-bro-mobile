@@ -35,7 +35,7 @@ const formatPrice = (price) => {
 export const ReviewScreen = ({ navigation }) => {
   const userData = useSelector((state) => state.profileData.profileData);
   const user = useSelector((state) => state.user.loggedInUser);
-  // console.log("user", user);
+  console.log("user", user);
   const dataBooking = useSelector((state) => state.appointment.appointments);
   const dispatch = useDispatch();
 
@@ -50,9 +50,9 @@ export const ReviewScreen = ({ navigation }) => {
     barber_id: dataBooking.barbershop.id,
     services: idServices,
     booking_date: formattedDate.getTime(),
-    booking_time: dataBooking.booking_time,
+    booking_time: dataBooking.booking_time
   };
-  // console.log("bookingValues", bookingValues);
+  console.log("bookingValues", bookingValues);
 
   const handleBooking = async () => {
     try {
@@ -156,7 +156,7 @@ export const ReviewScreen = ({ navigation }) => {
               <Image
                 source={{
                   uri:
-                    "http://10.10.102.48:8080" +
+                    "http://10.10.102.48:8085" +
                     dataBooking.barbershop.barbershop_profile_picture_id.path,
                 }}
                 className="w-10 h-10 rounded-md"
