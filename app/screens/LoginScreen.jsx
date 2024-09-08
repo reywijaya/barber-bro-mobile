@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   View,
-  Image,
   Text,
   TextInput,
   Pressable,
@@ -16,6 +14,10 @@ import { useDispatch } from "react-redux";
 import axiosInstance from "../service/axios";
 import { useTogglePasswordVisibility } from "../hooks/useTogglePasswordVisibility";
 import { login } from "../store/users";
+import { getDataProfile } from "../service/fetchDataProfile";
+import { AntDesign } from "@expo/vector-icons";
+import { ALERT_TYPE, Toast } from "react-native-alert-notification";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -26,19 +28,34 @@ export const LoginScreen = ({ navigation }) => {
     useTogglePasswordVisibility();
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      alert("Email or Password cannot be empty");
+    if (email === "" || password === "") {
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Email and password are required",
+        autoClose: 2000,
+      })
       return;
     }
 
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Please enter a valid email address",
+        autoClose: 2000,
+      })
       return;
     }
 
     if (password.length < 8) {
-      alert("Password must be at least 8 characters long");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Password must be at least 8 characters long",
+        autoClose: 2000,
+      })
       return;
     }
 
@@ -58,96 +75,113 @@ export const LoginScreen = ({ navigation }) => {
         }
 
         dispatch(login(response.data.data));
-        alert("Login successful");
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: "Success",
+          textBody: "Login successful",
+          autoClose: 2000,
+        });
         navigation.navigate("Tab", { screen: "Home" });
       } else {
-        alert("Login failed, please check your email and password");
+        Toast.show({
+          title: "Error",
+          type: ALERT_TYPE.DANGER,
+          textBody: "Login failed, please check your email or password",
+          autoClose: 2000,
+        })
       }
     } catch (error) {
       console.log("error:", error.response?.data || error.message);
-      alert("Login failed, please check your email and password");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Login failed, please check your email or password",
+        autoClose: 2000,
+      })
     }
   };
 
   return (
     <SafeAreaView>
-      <ScrollView className="flex flex-col bg-black p-4">
-        <View className="items-center h-screen">
-          <Image
-            source={require("../../assets/Gold.png")}
-            className="w-36 h-36"
-            resizeMode="contain"
-          />
-          <View className="w-full">
-            <View className="items-center mb-4 px-2">
-              <Text className="font-bold text-xl text-white">
-                Log in to your account!
+      <ScrollView>
+        <View className="flex flex-col min-h-screen p-8">
+          <View className="flex-row items-center gap-x-2">
+            <AntDesign name="rightsquareo" size={24} color="black" />
+            <Text className="text-xl">Sign in</Text>
+          </View>
+          <View className="my-10">
+            <Text className="text-3xl font-bold">Welcome to Barber Bro,
+              find the perfect barbershop near you.
+            </Text>
+            <Text className="my-2">
+              New to Barber Bro?{" "}
+              <Text
+                onPress={() => navigation.navigate("Register")}
+                className="font-bold text-blue-500"
+              >
+                Sign up here.
               </Text>
-            </View>
-            <View className="mb-4 px-2">
+            </Text>
+          </View>
+          <View className="gap-y-2 mb-2">
+            <Text>Email</Text>
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              className="py-3 px-4 rounded-full text-lg bg-zinc-200 focus:border-2 focus:border-zinc-600"
+              placeholder="Email"
+              placeholderTextColor="#a1a1aa"
+              keyboardType="email-address"
+            />
+          </View>
+          <View className="gap-y-2 mb-2">
+            <Text>Password</Text>
+            <View className="flex-row items-center py-3 px-4 rounded-full text-lg bg-zinc-200 focus:border-2 focus:border-zinc-600">
               <TextInput
-                value={email}
-                onChangeText={setEmail}
-                className="bg-gray-800 p-3 rounded text-white text-lg"
-                placeholder="Email"
-                placeholderTextColor="#6b7280"
-                keyboardType="email-address"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!isPasswordVisible}
+                className="text-lg flex-1"
+                placeholder="Password"
+                placeholderTextColor="#a1a1aa"
               />
-            </View>
-            <View className="mb-4 px-2">
-              <View className="flex-row items-center bg-gray-800 p-3 rounded">
-                <TextInput
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!isPasswordVisible}
-                  className="text-white text-lg flex-1"
-                  placeholder="Password"
-                  placeholderTextColor="#6b7280"
+              <Pressable onPress={togglePasswordVisibility}>
+                <MaterialCommunityIcons
+                  name={rightIcon}
+                  size={24}
+                  color="#18181b"
                 />
-                <Pressable onPress={togglePasswordVisibility}>
-                  <MaterialCommunityIcons
-                    name={rightIcon}
-                    size={24}
-                    color="white"
-                  />
-                </Pressable>
-              </View>
+              </Pressable>
             </View>
-            <View className="flex-row items-center mb-4">
+          </View>
+          <View className="flex-row items-center my-2 justify-between">
+            <View className="flex-row items-center">
               <CheckBox
                 checked={rememberMe}
                 onPress={() => setRememberMe(!rememberMe)}
+                checkedColor="#18181b"
                 containerStyle={{
                   backgroundColor: "transparent",
-                  borderColor: "transparent",
-                  margin: 0,
+                  borderWidth: 0,
                   padding: 0,
+                  margin: 0,
                 }}
-                checkedColor="#e4e4e7"
               />
-              <Text className="text-zinc-400">Remember me</Text>
+              <Text className={rememberMe ? "font-bold" : ""}>Remember me</Text>
             </View>
-            <View className="h-[1px] bg-gray-700 m-2" />
-            <View className="my-4 px-2">
-              <TouchableOpacity
-                className="bg-zinc-200 rounded py-2"
-                onPress={handleLogin}
-              >
-                <Text className="font-bold text-lg text-center text-zinc-800">
-                  Log in
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <Text className="text-blue-500 font-bold">Forgot Password?</Text>
           </View>
-          <Text className="text-white mt-4">
-            Don't have an account?{" "}
-            <Text
-              onPress={() => navigation.navigate("Register")}
-              className="font-bold text-blue-400"
+          <View className="h-[1px] bg-zinc-600 my-2" />
+          <View className="my-2">
+            <TouchableOpacity
+              className="bg-zinc-800 rounded-full py-3"
+              onPress={handleLogin}
             >
-              Sign up here.
-            </Text>
-          </Text>
+              <Text className="font-bold text-lg text-center text-zinc-200">
+                Sign in
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

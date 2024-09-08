@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import {
   Image,
   ScrollView,
@@ -19,6 +23,7 @@ import {
   setListBookingById,
   setListBookingUser,
 } from "../store/listBookingUser";
+import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 
 const toTitleCase = (str) =>
   str
@@ -52,7 +57,7 @@ export const ReviewScreen = ({ navigation }) => {
     barber_id: dataBooking.barbershop.id,
     services: idServices,
     booking_date: formattedDate.getTime(),
-    booking_time: dataBooking.booking_time
+    booking_time: dataBooking.booking_time,
   };
   console.log("bookingValues", bookingValues);
 
@@ -77,11 +82,10 @@ export const ReviewScreen = ({ navigation }) => {
       console.log("Booking successful");
     } catch (error) {
       console.error(error.response.data);
+      const casting=JSON.stringify(error.response.data.error);
 
       // Show error alert
-      Alert.alert("Booking Failed", "There was an issue with your booking. Please try again later.", [
-        { text: "OK" },
-      ]);
+      Alert.alert("Booking Failed", casting);
     }
   };
 
@@ -94,24 +98,24 @@ export const ReviewScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView>
-      <ScrollView>
-        {/* Header */}
-        <View className="flex-row bg-zinc-700 p-4 items-center gap-3">
-          <Ionicons
-            name="arrow-back"
-            size={20}
-            color="#e4e4e7"
-            onPress={() => navigation.goBack()}
-          />
-          <Text className="font-bold text-zinc-200">Review Booking</Text>
-        </View>
+    <SafeAreaView className="flex-1 bg-zinc-200">
+      {/* Back Button and Header */}
+      <View className="flex-row items-center p-2 bg-white border border-solid border-black">
+        <Ionicons
+          name="arrow-back"
+          size={24}
+          color="#030712"
+          onPress={() => navigation.goBack()}
+        />
+        <Text className="text-zinc-900 text-xl font-bold ml-2">Back</Text>
+      </View>
 
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 80 }}>
         {/* Main Content */}
-        <View className="bg-zinc-900 h-screen">
+        <View className="bg-white mt-2 mx-2 p-4 rounded-md shadow-md">
           {/* Booking Information */}
-          <View className="flex-col bg-zinc-700 m-2 p-4 rounded-md">
-            <View className="flex-row gap-4 items-center">
+          <View className="bg-zinc-700 p-4 rounded-md mb-4">
+            <View className="flex-row gap-4 items-center mb-4">
               <UserAvatar
                 size={50}
                 name={`${userData.firstName} ${userData.surname}`}
@@ -130,7 +134,7 @@ export const ReviewScreen = ({ navigation }) => {
             </View>
 
             {/* Booking Details */}
-            <View className="border-b border-zinc-600 p-2 my-4">
+            <View className="border-b border-zinc-600 pb-2 mb-4">
               <View className="flex-row justify-between mb-3">
                 <Text className="text-zinc-400">Date</Text>
                 <Text className="text-zinc-400 text-xs">
@@ -138,14 +142,16 @@ export const ReviewScreen = ({ navigation }) => {
                 </Text>
               </View>
 
-              <View className="flex-row justify-between ">
+              <View className="flex-row justify-between mb-1">
                 <Text className="text-zinc-400 text-md">Service</Text>
               </View>
 
               {dataBooking.services.map((item) => (
                 <View className="flex-row justify-between my-1" key={item.id}>
                   <Text className="text-zinc-400 text-xs">{item.name}</Text>
-                  <Text className="text-zinc-400 text-xs">{formatPrice(item.price)}</Text>
+                  <Text className="text-zinc-400 text-xs">
+                    {formatPrice(item.price)}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -159,20 +165,21 @@ export const ReviewScreen = ({ navigation }) => {
           </View>
 
           {/* Barbershop Information */}
-          <View className="flex-col bg-zinc-700 m-2 p-4 rounded-md">
-            <View className="flex-row gap-4 items-center">
+          <View className="bg-zinc-700 p-4 rounded-md mb-4">
+            <View className="flex-row gap-4 items-center mb-4">
               <Image
                 source={{
                   uri:
                     "http://10.10.102.48:8085" +
                     dataBooking.barbershop.barbershop_profile_picture_id.path,
                 }}
-                className="w-10 h-10 rounded-md"
+                className="w-12 h-12 rounded-md"
                 resizeMode="cover"
               />
               <View className="flex-col">
                 <Text className="font-bold text-zinc-400 text-sm">
                   {dataBooking.barbershop.name}
+                  <MaterialIcons name="verified" size={18} color="white" />
                 </Text>
                 {dataBooking.barbershop.operational_hours.map((item) => (
                   <View className="flex-row" key={item.id}>
@@ -187,7 +194,7 @@ export const ReviewScreen = ({ navigation }) => {
 
             {/* Get Directions Button */}
             <TouchableOpacity
-              className="flex-row items-center"
+              className="flex-row items-center bg-zinc-600 p-2 rounded-md mb-4"
               onPress={() =>
                 navigation.navigate("Maps", {
                   latitude: dataBooking.barbershop.latitude,
@@ -196,16 +203,12 @@ export const ReviewScreen = ({ navigation }) => {
                 })
               }
             >
-              <View className="flex-row bg-zinc-600 p-2 my-3 w-full rounded-md items-center justify-center">
-                <MaterialCommunityIcons
-                  color={"#d1d5db"}
-                  name="map-marker"
-                  size={20}
-                />
-                <Text className="text-zinc-400 text-sm ml-2">
-                  Get direction
-                </Text>
-              </View>
+              <MaterialCommunityIcons
+                color={"#d1d5db"}
+                name="map-marker"
+                size={20}
+              />
+              <Text className="text-zinc-400 text-sm ml-2">Get direction</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -213,7 +216,7 @@ export const ReviewScreen = ({ navigation }) => {
 
       {/* Booking Button */}
       <TouchableOpacity
-        className="bg-zinc-200 w-full p-4 items-center justify-center absolute bottom-0 right-0 left-0 "
+        className="bg-white w-full p-4 items-center justify-center absolute bottom-0 right-0 left-0 border-t border-zinc-300"
         onPress={() => setModalVisible(true)}
       >
         <Text className="text-zinc-900 font-bold text-base">Booking Now</Text>
@@ -226,7 +229,7 @@ export const ReviewScreen = ({ navigation }) => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+        <View className="flex-1 justify-center items-center bg-opacity-50">
           <View className="bg-zinc-200 p-4 rounded-md w-80">
             <Text className="text-lg font-bold mb-4">Confirm Booking</Text>
             <Text className="mb-4">

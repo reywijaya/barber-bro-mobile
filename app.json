@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "barber-bro",
-    "slug": "barber-bro",
+    "name": "barber-bro-app",
+    "slug": "barber-bro-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/Gold.png",
-    "userInterfaceStyle": "dark",
+    "icon": "./assets/Black.png",
+    "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/Gold.png",
+      "image": "./assets/Black.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#fff"
     },
     "ios": {
       "supportsTablet": true
@@ -17,7 +17,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/Gold.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#fff"
       }
     },
     "web": {

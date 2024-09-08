@@ -14,7 +14,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 import { setAppointments } from "../store/appointment";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 
 const toTitleCase = (str) => {
   return str.replace(
@@ -32,7 +33,6 @@ const formatPrice = (price) => {
 };
 
 const validateTime = (selectedTimeString, operationalHours) => {
-  // Ensure operationalHours is an array
   if (!Array.isArray(operationalHours)) {
     console.warn("Operational hours data is not an array.");
     return false;
@@ -209,10 +209,12 @@ export default function AppointmentScreen({ route, navigation }) {
         if (validateTime(formattedTime, barbershop.operational_hours)) {
           setSelectedTime(formattedTime);
         } else {
-          Alert.alert(
-            "Invalid Time",
-            `Time ${formattedTime} is not within operational hours barbershop.`
-          );
+          Toast.show({
+            title: "Error",
+            type: ALERT_TYPE.DANGER,
+            textBody: `Time ${formattedTime} is not within operational hours barbershop.`,
+            autoClose: 2000,
+          });
         }
       }
     } catch (error) {
@@ -222,17 +224,42 @@ export default function AppointmentScreen({ route, navigation }) {
 
   const saveBookingData = async () => {
     if (!selectedServiceId) {
-      alert("Please select a service.");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Please select a service.",
+        autoClose: 2000,
+      });
       return;
     }
 
     if (!formattedDate || !selectedTime) {
-      alert("Please select both date and time.");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Please select a date and time.",
+        autoClose: 2000,
+      });
+      return;
+    }
+
+    if (!validateTime(selectedTime, barbershop.operational_hours)) {
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: `Time ${selectedTime} is not within operational hours barbershop.`,
+        autoClose: 2000,
+      });
       return;
     }
 
     if (!userData || !userData.token) {
-      alert("User data is missing. Please log in again.");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Please login first.",
+        autoClose: 2000,
+      });
       return;
     }
 
@@ -259,15 +286,20 @@ export default function AppointmentScreen({ route, navigation }) {
       navigation.navigate("Review");
     } catch (error) {
       console.error("Failed to save booking data:", error);
-      alert("Failed to save booking data. Please try again.");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Failed to save booking data. Please try again.",
+        autoClose: 2000,
+      });
     }
   };
 
   if (!barbershop || !barbershop.services || !barbershop.operational_hours) {
     return (
       <SafeAreaView>
-        <View className="h-screen items-center bg-zinc-900 justify-center">
-          <Text className="text-zinc-200 font-bold text-base">
+        <View className="h-screen items-center bg-zinc-200 justify-center">
+          <Text className="text-zinc-800 font-bold text-base">
             No Barbershop Data Available
           </Text>
         </View>
@@ -276,140 +308,126 @@ export default function AppointmentScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView className="flex-1">
-      <ScrollView
-        className="flex-1"
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-      >
-        {/* Back Button and Header */}
-        <View className="flex-row bg-zinc-800 p-2 items-center gap-3">
-          <Ionicons
-            name="arrow-back"
-            size={20}
-            color="#e4e4e7"
-            onPress={() => navigation.goBack()}
-          />
-          <Text className="text-zinc-200 text-xl">Back</Text>
-        </View>
+    <SafeAreaView className="flex-1 bg-zinc-200">
+      {/* Header */}
+      <View className="flex-row p-2 items-center border-solid border-b-2 border-t-2 bg-white">
+        <Ionicons
+          name="arrow-back"
+          size={20}
+          color="#030712"
+          onPress={() => navigation.goBack()}
+        />
+        <Text className="text-xl text-zinc-800 font-bold ml-2">Back</Text>
+      </View>
 
-        <View className="bg-zinc-900 p-2 ">
-          {/* Barbershop Header */}
-          <View className="mb-4">
-            <ImageBackground
+      {/* Main Content */}
+      <View className="flex-1">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {/* Barbershop Info */}
+          <View className="flex-row items-center p-4 bg-black ">
+            <Image
               source={{
                 uri:
                   "http://10.10.102.48:8085" +
-                  (barbershop.barbershop_profile_picture_id?.path || ""),
+                  barbershop.barbershop_profile_picture_id?.path,
               }}
-              className="w-full h-64 rounded-lg overflow-hidden"
-              style={{ opacity: 0.8 }}
-            >
-              {/* Gradient overlay for better text readability */}
-              <View className="absolute top-0 left-0 right-0 bottom-0 bg-black/60" />
-
-              <View className="absolute bottom-0 left-0 right-0 p-4">
-                <View className="flex-row items-center">
-                  <Image
-                    source={{
-                      uri:
-                        "http://10.10.102.48:8085" +
-                        (barbershop.barbershop_profile_picture_id?.path || ""),
-                    }}
-                    className="w-20 h-20 rounded-md"
-                    style={{ resizeMode: "cover", opacity: 1 }}
-                  />
-                  <View className="ml-4">
-                    <Text className="text-white font-bold text-base shadow-lg border-b border-collapse">
-                      {barbershop.name || "No Name Available"}
+              className="w-24 h-24 rounded-lg border-4 border-white"
+            />
+            <View className="ml-4 flex-1">
+              <Text className="text-white text-lg font-bold mb-2 text-justify">
+                {barbershop.name}
+                <MaterialIcons name="verified" size={18} color="white" />
+              </Text>
+              <View>
+                {barbershop.operational_hours.length > 0 ? (
+                  barbershop.operational_hours.map((hour, index) => (
+                    <Text key={index} className="text-white text-sm">
+                      {toTitleCase(hour.day)}:{" "}
+                      {hour.opening_time.substring(0, 5)} -{" "}
+                      {hour.closing_time.substring(0, 5)}
                     </Text>
-                    <View className="mt-2">
-                      {barbershop.operational_hours.length > 0 ? (
-                        barbershop.operational_hours.map((hour, index) => (
-                          <Text
-                            key={index}
-                            className="text-white text-xs shadow-md"
-                          >
-                            {toTitleCase(hour.day)}:{" "}
-                            {hour.opening_time.substring(0, 5)} -{" "}
-                            {hour.closing_time.substring(0, 5)}
-                          </Text>
-                        ))
-                      ) : (
-                        <Text className="text-zinc-300 text-xs">Closed</Text>
-                      )}
-                    </View>
-                  </View>
-                </View>
+                  ))
+                ) : (
+                  <Text className="text-white text-sm">Closed</Text>
+                )}
               </View>
-            </ImageBackground>
-          </View>
-
-          {/* Service Selection */}
-          <View className="mb-4">
-            <Text className="text-zinc-400 font-bold text-base">
-              Choose Service
-            </Text>
-            <View className="mt-2">
-              {radioButtons.map(({ id, label, price }) => (
-                <TouchableOpacity
-                  key={id}
-                  onPress={() => handleServiceChange(id)}
-                  className={`p-4 mb-2 rounded-lg ${
-                    selectedServiceId === id ? "bg-zinc-600" : "bg-zinc-800"
-                  }`}
-                >
-                  <Text className="text-zinc-200 font-semibold text-lg">
-                    {label}
-                  </Text>
-                  <Text className="text-zinc-400">{formatPrice(price)}</Text>
-                </TouchableOpacity>
-              ))}
             </View>
           </View>
 
-          {/* Date and Time Picker */}
-          <View className="mb-4">
-            <Text className="text-zinc-400 font-bold text-base">
-              Select Date and Time
+          {/* Service Selection */}
+          <View className="p-4 bg-zinc-200">
+            <Text className="text-xl font-bold text-zinc-800 mb-2">
+              Select Service
+            </Text>
+            <View className="mb-4">
+              {radioButtons.map((service) => (
+                <TouchableOpacity
+                  key={service.id}
+                  onPress={() => handleServiceChange(service.id)}
+                  className={`p-4 mb-2 border rounded-md ${
+                    selectedServiceId === service.id
+                      ? "bg-zinc-300 border-zinc-600"
+                      : "bg-white border-zinc-400"
+                  }`}
+                >
+                  <Text className="text-lg font-semibold text-zinc-800">
+                    {service.label}
+                  </Text>
+                  <Text className="text-base text-zinc-600">
+                    {formatPrice(service.price)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Booking Details */}
+            <Text className="text-xl font-bold text-zinc-800 mb-2">
+              Booking Details
             </Text>
             <TouchableOpacity
               onPress={showDatepicker}
-              className="flex flex-row items-center mt-2 p-4 bg-zinc-800 rounded-lg"
+              className="p-4 mb-2 bg-white border rounded-md border-zinc-400"
             >
-              <Ionicons name="calendar" size={20} color="white" />
-              <Text className="text-zinc-200 ml-2">{formattedDate}</Text>
+              <Text className="text-lg text-zinc-800">
+                Date: {formattedDate}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={showTimepicker}
-              className="flex flex-row items-center mt-2 p-4 bg-zinc-800 rounded-lg"
+              className="p-4 mb-2 bg-white border rounded-md border-zinc-400"
             >
-              <Ionicons name="time" size={20} color="white" />
-              <Text className="text-zinc-200 ml-2">{selectedTime}</Text>
+              <Text className="text-lg text-zinc-800">
+                Time: {selectedTime}
+              </Text>
             </TouchableOpacity>
-          </View>
 
-          {/* Total Payment */}
-          <View className="mb-4">
-            <Text className="text-zinc-400 font-bold text-base">
+            {/* Total Payment */}
+            <Text className="text-xl font-bold text-zinc-800 mt-4">
               Total Payment
             </Text>
-            <Text className="text-zinc-200 p-4 bg-zinc-800 rounded-lg">
-              {formatPrice(totalPayment)}
-            </Text>
+            <View className="mt-2 p-4 bg-white border rounded-md border-zinc-400 mb-16">
+              <Text className="text-xl text-zinc-800">
+                {formatPrice(totalPayment)}
+              </Text>
+            </View>
           </View>
+        </ScrollView>
+      </View>
 
-          {/* Confirm Booking Button */}
-          <TouchableOpacity
-            onPress={saveBookingData}
-            className="bg-zinc-200 rounded-lg p-4"
-          >
-            <Text className="text-zinc-900 text-center font-bold">
-              Confirm Booking
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+      {/* Booking Button */}
+      <TouchableOpacity
+        className="absolute bottom-0 left-0 right-0 bg-zinc-100 p-4 border border-zinc-950"
+        onPress={saveBookingData}
+      >
+        <Text className="text-zinc-900 font-bold text-center text-lg">
+          Continue
+        </Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }

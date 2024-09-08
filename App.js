@@ -4,6 +4,7 @@ import AppNavigator from "./app/AppNavigator";
 import {Provider} from "react-redux";
 
 import store from "./app/store";
+import { AlertNotificationRoot } from "react-native-alert-notification";
 
 
 
@@ -12,7 +13,9 @@ export default function App() {
         <Provider store={store}>
             <SafeAreaProvider>
                 <NavigationContainer>
-                    <AppNavigator/>
+                    <AlertNotificationRoot>
+                        <AppNavigator/>
+                    </AlertNotificationRoot>
                 </NavigationContainer>
             </SafeAreaProvider>
         </Provider>

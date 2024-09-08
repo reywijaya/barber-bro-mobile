@@ -4,7 +4,8 @@ import { Text, TouchableOpacity, View, Alert } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
-import { tailwind } from 'nativewind'; // import tailwind from nativewind
+import { tailwind } from "nativewind"; // import tailwind from nativewind
+import { Toast } from "react-native-alert-notification";
 
 const MapsComponent = ({ route, navigation }) => {
   const { latitude, longitude, markerTitle } = route.params;
@@ -24,7 +25,15 @@ const MapsComponent = ({ route, navigation }) => {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           setErrorMsg("Permission to access location was denied");
-          Alert.alert("Permission Denied", "Please enable location services to use this feature.");
+          // Alert.alert(
+          //   "Permission Denied",
+          //   "Please enable location services to use this feature."
+          // );
+          Toast.show({
+            type: "error",
+            text: "Please enable location services to use this feature.",
+            autoClose: 2000,
+          })
           return;
         }
 
@@ -33,7 +42,10 @@ const MapsComponent = ({ route, navigation }) => {
 
         // Calculate the route (straight line)
         setRouteCoordinates([
-          { latitude: location.coords.latitude, longitude: location.coords.longitude },
+          {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          },
           { latitude: latitude, longitude: longitude },
         ]);
       } catch (error) {
@@ -79,11 +91,15 @@ const MapsComponent = ({ route, navigation }) => {
   return (
     <SafeAreaView className="flex-1">
       <View className="flex-1">
-        <View className="flex-row bg-gray-800 items-center p-2">
-          <TouchableOpacity className="p-2" onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="#f4f4f5" />
-          </TouchableOpacity>
-          <Text className="text-white font-bold text-lg">Back</Text>
+        {/* Back Button and Header */}
+        <View className="flex-row items-center p-2 bg-white border border-solid border-black">
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color="#030712"
+            onPress={() => navigation.goBack()}
+          />
+          <Text className="text-zinc-900 text-xl font-bold ml-2">Back</Text>
         </View>
 
         {/* MAPS */}
@@ -99,7 +115,10 @@ const MapsComponent = ({ route, navigation }) => {
             />
             {currentLocation && (
               <Marker
-                coordinate={{ latitude: currentLocation.latitude, longitude: currentLocation.longitude }}
+                coordinate={{
+                  latitude: currentLocation.latitude,
+                  longitude: currentLocation.longitude,
+                }}
                 title="Your Location"
                 pinColor="blue"
               />
@@ -115,13 +134,22 @@ const MapsComponent = ({ route, navigation }) => {
 
           {/* Zoom Controls */}
           <View className="absolute bottom-12 right-2 items-center">
-            <TouchableOpacity className="m-2 bg-gray-800 rounded-full p-2" onPress={zoomIn}>
+            <TouchableOpacity
+              className="m-2 bg-gray-800 rounded-full p-2"
+              onPress={zoomIn}
+            >
               <Ionicons name="add-circle" size={36} color="white" />
             </TouchableOpacity>
-            <TouchableOpacity className="m-2 bg-gray-800 rounded-full p-2" onPress={zoomOut}>
+            <TouchableOpacity
+              className="m-2 bg-gray-800 rounded-full p-2"
+              onPress={zoomOut}
+            >
               <Ionicons name="remove-circle" size={36} color="white" />
             </TouchableOpacity>
-            <TouchableOpacity className="m-2 bg-gray-800 rounded-full p-2" onPress={goToCurrentLocation}>
+            <TouchableOpacity
+              className="m-2 bg-gray-800 rounded-full p-2"
+              onPress={goToCurrentLocation}
+            >
               <MaterialIcons name="my-location" size={36} color="white" />
             </TouchableOpacity>
           </View>

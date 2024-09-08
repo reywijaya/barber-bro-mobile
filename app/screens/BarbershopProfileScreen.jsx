@@ -6,6 +6,7 @@ import {
   View,
   ScrollView,
   Linking,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -102,223 +103,202 @@ export default function BarbershopProfileScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 bg-zinc-200">
+      {/* Back Button and Header */}
+      <View className="flex-row items-center p-2 bg-white border border-solid border-black">
+        <Ionicons
+          name="arrow-back"
+          size={24}
+          color="#030712"
+          onPress={() => navigation.goBack()}
+        />
+        <Text className="text-zinc-900 text-xl font-bold ml-2">Back</Text>
+      </View>
       <ScrollView
-        className="flex-1"
-        refreshing={refresh}
-        onRefresh={handleRefresh}
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl refreshing={refresh} onRefresh={handleRefresh} />
+        }
       >
-        <View>
-          {/* Back Button and Header */}
-          <View className="flex-row bg-zinc-900 p-2 items-center gap-3">
-            <Ionicons
-              name="arrow-back"
-              size={20}
-              color="#e4e4e7"
-              onPress={() => navigation.goBack()}
+        {/* Barbershop Information */}
+        <View className="bg-zinc-100 shadow-md mb-2">
+          <View className="flex-row items-center bg-black p-4 mb-2">
+            <Image
+              source={{
+                uri: `http://10.10.102.48:8085${barbershop.barbershop_profile_picture_id.path}`,
+              }}
+              style={{ width: 90, height: 90 }}
+              className="rounded-lg border-4 border-white"
             />
-            <Text className="text-zinc-200 text-xl">Back</Text>
+            <View className="ml-4 flex-1">
+              <Text className="text-zinc-100 text-lg font-semibold">
+                {toTitleCase(barbershop.name)}
+                <MaterialIcons name="verified" size={18} color="white" />
+              </Text>
+              <Text className="text-zinc-100 text-justify">{barbershop.address}</Text>
+              <Text className="text-zinc-100 text-justify">{barbershop.street_address}</Text>
+              <Text className="text-zinc-100 mt-1">
+                {`${barbershop.city}, ${barbershop.state_province_region}, ${barbershop.postal_zip_code}, ${barbershop.country}`}
+              </Text>
+            </View>
           </View>
 
-          {/* Barbershop Information */}
-          <View className="flex-col bg-black p-2">
-            <View className="flex-col items-center rounded-lg p-2 bg-zinc-900 my-2">
-              <Image
-                source={{
-                  uri: `http://10.10.102.48:8085${barbershop.barbershop_profile_picture_id.path}`,
-                }}
-                style={{ width: 90, height: 90 }}
-                className="rounded-lg"
-              />
-              <View className="mt-2 items-center">
-                <View className="flex-row items-center gap-x-2">
-                  <Text className="text-zinc-200 font-bold text-lg">
-                    {toTitleCase(barbershop.name)}
-                  </Text>
-                  <MaterialIcons name="verified" size={16} color="white" />
-                </View>
-                <View className="flex-col items-center gap-y-1">
-                  <Text className="text-zinc-400">{barbershop.address}</Text>
-                  <Text className="text-zinc-400">
-                    {barbershop.street_address}
-                  </Text>
-                  <Text className="text-zinc-400">{`${barbershop.city}, ${barbershop.state_province_region}, ${barbershop.postal_zip_code}, ${barbershop.country}`}</Text>
-                </View>
-              </View>
-            </View>
+          {/* Location and Description */}
+          <TouchableOpacity
+            className="flex-row items-center justify-center p-4 bg-white mt-2 mb-3 border border-zinc-950"
+            onPress={() =>
+              navigation.navigate("Maps", {
+                latitude: barbershop.latitude,
+                longitude: barbershop.longitude,
+                markerTitle: barbershop.name,
+              })
+            }
+          >
+            <Ionicons name="location-outline" size={20} color="black" />
+            <Text className="text-zinc-900 text-lg font-bold ml-2 ">
+              View Location
+            </Text>
+          </TouchableOpacity>
+          <View className="bg-white p-4 rounded-lg shadow-md mb-2">
+            <Text className="text-zinc-600 font-bold mb-3">Description</Text>
+            <Text className="text-zinc-900 mt-1 text-justify">
+              {toTitleCase(barbershop.description)}
+            </Text>
+          </View>
 
-            {/* Location and Description */}
-            <TouchableOpacity
-              className="flex-row justify-center items-center rounded-lg p-2 bg-zinc-900"
-              onPress={() =>
-                navigation.navigate("Maps", {
-                  latitude: barbershop.latitude,
-                  longitude: barbershop.longitude,
-                  markerTitle: barbershop.name,
-                })
-              }
-            >
-              <View className="px-2">
-                <Ionicons name="location-outline" size={20} color="#e4e4e7" />
-              </View>
-              <Text className="text-zinc-200">View Location</Text>
-            </TouchableOpacity>
-            <View className="flex-row mt-2 justify-around items-center rounded-lg p-2 bg-zinc-900">
-              <View className="items-center">
-                <Text className="text-zinc-400 p-2">Description</Text>
-                <Text className="text-zinc-200 p-2">
-                  {toTitleCase(barbershop.description)}
-                </Text>
-              </View>
-            </View>
+          {/* Gallery */}
+          <View className="bg-white p-4 rounded-lg shadow-md mb-4">
+            <Text className="text-zinc-600 font-bold mb-3">Gallery</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {dummyImage.map((image) => (
+                <Image
+                  key={image.id}
+                  source={{ uri: image.imageURL }}
+                  style={{ width: 240, height: 160 }}
+                  className="rounded-lg m-2 border border-zinc-300"
+                />
+              ))}
+            </ScrollView>
+          </View>
 
-            {/* Gallery */}
-            <View className="bg-black">
-              <Text className="text-zinc-400 px-1 font-bold mb-2 mt-2">
-                Gallery
-              </Text>
-              <View className="bg-zinc-900 p-2 rounded-lg">
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  {dummyImage.map((image) => (
-                    <Image
-                      key={image.id}
-                      source={{ uri: image.imageURL }}
-                      className="h-40 w-60 rounded-lg m-2"
-                    />
-                  ))}
-                </ScrollView>
-              </View>
-            </View>
-
-            {/* Operational Hours */}
-            <View className="bg-black">
-              <Text className="text-zinc-400 px-1 font-bold mb-2 mt-2">
-                Operational Hours
-              </Text>
-              <View className="bg-zinc-900 p-2 rounded-lg">
-                <ScrollView>
-                  {barbershop.operational_hours.map((item) => (
-                    <View
-                      key={item.day}
-                      className="flex-row justify-between p-2"
-                    >
-                      <Text className="text-lg text-zinc-200">
-                        {toTitleCase(item.day)}
-                      </Text>
-                      <Text className="text-lg font-bold text-zinc-200">
-                        {`${item.opening_time.substring(
-                          0,
-                          2
-                        )}.${item.opening_time.substring(
-                          3,
-                          5
-                        )} - ${item.closing_time.substring(
-                          0,
-                          2
-                        )}.${item.closing_time.substring(3, 5)}`}
-                      </Text>
-                    </View>
-                  ))}
-                </ScrollView>
-              </View>
-            </View>
-
-            {/* Services */}
-            <View className="bg-black">
-              <Text className="text-zinc-400 px-1 font-bold mb-2 mt-2">
-                Services
-              </Text>
-              <View className="bg-zinc-900 p-2 rounded-lg">
-                <ScrollView>
-                  {barbershop.services.map((item) => (
-                    <View
-                      key={item.service_name}
-                      className="flex-row justify-between p-2"
-                    >
-                      <Text className="text-lg text-zinc-200">
-                        {toTitleCase(item.service_name)}
-                      </Text>
-                      <Text className="text-lg font-bold text-zinc-200">
-                        {new Intl.NumberFormat("id-ID", {
-                          style: "currency",
-                          currency: "IDR",
-                          minimumFractionDigits: 2,
-                        }).format(item.price)}
-                      </Text>
-                    </View>
-                  ))}
-                </ScrollView>
-              </View>
-            </View>
-
-            {/* Social Media */}
-            <View className="bg-black">
-              <Text className="text-zinc-400 px-1 font-bold mb-2 mt-2">
-                Social Media
-              </Text>
-              <View className="flex flex-row bg-zinc-900 p-2 rounded-lg">
-                <ScrollView
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
+          {/* Operational Hours */}
+          <View className="bg-white p-4 rounded-lg shadow-md mb-4">
+            <Text className="text-zinc-600 font-bold mb-3">
+              Operational Hours
+            </Text>
+            <ScrollView>
+              {barbershop.operational_hours.map((item) => (
+                <View
+                  key={item.day}
+                  className="flex-row justify-between p-2 border-b border-zinc-300"
                 >
-                  {barbershop.social_media.map((item) => (
-                    <View key={item.platform_name} className="space-x-2 p-2">
-                      <FontAwesome5
-                        name={item.platform_name.toLowerCase()}
-                        size={24}
-                        color="#e4e4e7"
-                        onPress={() => Linking.openURL(item.platform_url)}
-                      />
-                    </View>
-                  ))}
-                </ScrollView>
-              </View>
-            </View>
+                  <Text className="text-lg text-zinc-800">
+                    {toTitleCase(item.day)}
+                  </Text>
+                  <Text className="text-lg font-bold text-zinc-800">
+                    {`${item.opening_time.substring(
+                      0,
+                      2
+                    )}:${item.opening_time.substring(
+                      3,
+                      5
+                    )} - ${item.closing_time.substring(
+                      0,
+                      2
+                    )}:${item.closing_time.substring(3, 5)}`}
+                  </Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
 
-            {/* Reviews */}
-            <View className="bg-black mb-9">
-              <Text className="text-zinc-400 px-1 font-bold mb-2 mt-2">
-                Reviews
-              </Text>
-              <View className="bg-zinc-900 p-2 rounded-lg">
-                {reviews.map((item) => (
-                  <View
-                    key={item.id}
-                    className="bg-zinc-900  flex flex-col mb-4"
-                  >
-                    <View className="flex-row items-center justify-between">
-                      <Image
-                        source={{ uri: item.profile_image }}
-                        alt="user profile"
-                        className="w-10 h-10 rounded-md"
-                      />
-                      <Text className="text-zinc-200 ml-2">{item.name}</Text>
-                      <Text className="text-zinc-400 ml-2">{item.date}</Text>
+          {/* Services */}
+          <View className="bg-white p-4 rounded-lg shadow-md mb-4">
+            <Text className="text-zinc-600 font-bold mb-3">Services</Text>
+            <ScrollView>
+              {barbershop.services.map((item) => (
+                <View
+                  key={item.service_name}
+                  className="flex-row justify-between p-2 border-b border-zinc-300"
+                >
+                  <Text className="text-lg text-zinc-800">
+                    {toTitleCase(item.service_name)}
+                  </Text>
+                  <Text className="text-lg font-bold text-zinc-800">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                      minimumFractionDigits: 2,
+                    }).format(item.price)}
+                  </Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+
+          {/* Social Media */}
+          <View className="bg-white p-4 rounded-lg shadow-md mb-4">
+            <Text className="text-zinc-600 font-bold mb-3">Social Media</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {barbershop.social_media.map((item) => (
+                <View key={item.platform_name} className="p-2">
+                  <FontAwesome5
+                    name={item.platform_name.toLowerCase()}
+                    size={24}
+                    color="black"
+                    onPress={() => Linking.openURL(item.platform_url)}
+                  />
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+
+          {/* Reviews */}
+          <View className="bg-white p-4 rounded-lg shadow-md mb-9">
+            <Text className="text-zinc-600 font-bold mb-3">Reviews</Text>
+            <View className="bg-zinc-100 p-2 rounded-lg">
+              {reviews.map((item) => (
+                <View
+                  key={item.id}
+                  className="bg-white p-4 mb-4 border border-zinc-300 rounded-lg shadow-sm"
+                >
+                  <View className="flex-row items-center justify-between mb-2">
+                    <Image
+                      source={{ uri: item.profile_image }}
+                      style={{ width: 40, height: 40 }}
+                      className="rounded-md"
+                    />
+                    <View className="ml-2 flex-1">
+                      <Text className="text-zinc-800 font-medium">
+                        {item.name}
+                      </Text>
+                      <Text className="text-zinc-500 text-sm">{item.date}</Text>
                     </View>
-                    <View className="flex-row mt-2">
-                      <Rating
-                        type="star"
-                        ratingCount={5}
-                        imageSize={20}
-                        readonly
-                        startingValue={item.rating}
-                        tintColor="#18181b"
-                      />
-                    </View>
-                    <Text className="text-zinc-200 mt-2">{item.comment}</Text>
+                    <Rating
+                      type="star"
+                      ratingCount={5}
+                      imageSize={20}
+                      readonly
+                      startingValue={item.rating}
+                      tintColor="#f9f9f9"
+                    />
                   </View>
-                ))}
-              </View>
+                  <Text className="text-zinc-800 mt-2">{item.comment}</Text>
+                </View>
+              ))}
             </View>
           </View>
         </View>
       </ScrollView>
+
       {/* Booking Button */}
       <TouchableOpacity
-        className="absolute bottom-0 right-0 left-0 bg-opacity-100 bg-zinc-200 p-3 mx-2 rounded-lg"
+        className="absolute bottom-0 left-0 right-0 bg-zinc-100 p-4 border border-zinc-950"
         onPress={handleBookNow}
       >
-        <Text className="text-zinc-900 font-bold text-center">Book Now</Text>
+        <Text className="text-zinc-900 font-bold text-center text-lg">
+          Book Now
+        </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
