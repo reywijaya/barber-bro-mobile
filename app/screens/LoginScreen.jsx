@@ -1,22 +1,21 @@
+import React, { useState } from "react";
 import {
-  Image,
-  Pressable,
+  SafeAreaView,
   ScrollView,
+  View,
+  Image,
   Text,
   TextInput,
+  Pressable,
   TouchableOpacity,
-  View,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import axiosInstance from "../service/axios";
-import { useDispatch } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CheckBox } from "react-native-elements";
-import { useTogglePasswordVisibility } from "../hooks/useTogglePasswordVisibility";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import axiosInstance from "../service/axios";
+import { useTogglePasswordVisibility } from "../hooks/useTogglePasswordVisibility";
 import { login } from "../store/users";
-import { getDataProfile } from "../service/fetchDataProfile";
 
 export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -25,76 +24,55 @@ export const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { isPasswordVisible, togglePasswordVisibility, rightIcon } =
     useTogglePasswordVisibility();
-  // console.log(rememberMe);
-
-  const loadUserData = async () => {
-    try {
-      const userData = await AsyncStorage.getItem("loggedInUser");
-      if (userData) {
-        const { email, rememberMe } = JSON.parse(userData);
-        setEmail(email);
-        setRememberMe(rememberMe);
-      }
-    } catch (error) {
-      console.error("Failed to load user data from AsyncStorage:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadUserData();
-  }, []);
 
   const handleLogin = async () => {
-    if (email === "" || password === "") {
+    if (!email || !password) {
       alert("Email or Password cannot be empty");
       return;
     }
+
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (!emailRegex.test(email)) {
       alert("Please enter a valid email address");
       return;
     }
+
     if (password.length < 8) {
       alert("Password must be at least 8 characters long");
       return;
     }
-    try {
-      const response = await axiosInstance.post(`/login`, {
-        email,
-        password,
-      });
-      console.log("response",response.data.data);
-      if (!response.data.data) {
-        alert("Login failed, please check your email and password");
-        return;
-      }
-      alert("Login successful");
 
-      if (rememberMe === true) {
+    try {
+      const response = await axiosInstance.post(`/login`, { email, password });
+      if (response.status === 200) {
+        const token = response.data.data.token;
+        await AsyncStorage.setItem("token", token);
+
+        if (rememberMe) {
+          await AsyncStorage.setItem(
+            "rememberedUser",
+            JSON.stringify(response.data.data)
+          );
+        } else {
+          await AsyncStorage.removeItem("rememberedUser");
+        }
+
         dispatch(login(response.data.data));
-        await AsyncStorage.setItem(
-          "loggedInUser",
-          JSON.stringify(response.data.data)
-        );
-        navigation.navigate("Tab", {
-          screen: "Home",
-        });
-      } else if (rememberMe === false) {
-        dispatch(login(response.data.data));
-        navigation.navigate("Tab", {
-          screen: "Home",
-        });
+        alert("Login successful");
+        navigation.navigate("Tab", { screen: "Home" });
+      } else {
+        alert("Login failed, please check your email and password");
       }
     } catch (error) {
+      console.log("error:", error.response?.data || error.message);
       alert("Login failed, please check your email and password");
-      console.log(error.response.data);
     }
   };
 
   return (
     <SafeAreaView>
       <ScrollView className="flex flex-col bg-black p-4">
-        <View className="items-center h-screen mr">
+        <View className="items-center h-screen">
           <Image
             source={require("../../assets/Gold.png")}
             className="w-36 h-36"

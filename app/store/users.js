@@ -11,21 +11,18 @@ const users = createSlice({
   reducers: {
     login(state, action) {
       state.loggedInUser = action.payload;
+      AsyncStorage.setItem('loggedInUser', JSON.stringify(state.loggedInUser));
     },
     logout(state) {
       state.loggedInUser = {};
-
-      // Hapus data loggedInUser dari AsyncStorage
       AsyncStorage.removeItem('loggedInUser');
     },
     edit(state, action) {
       state.loggedInUser = action.payload;
-
-      // Simpan data loggedInUser ke AsyncStorage
       AsyncStorage.setItem('loggedInUser', JSON.stringify(state.loggedInUser));
     },
   },
 });
 
-export const { login, logout, edit } = users.actions;
+export const { login, logout } = users.actions;
 export default users.reducer;

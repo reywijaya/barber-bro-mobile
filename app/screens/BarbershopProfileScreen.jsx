@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -17,7 +18,6 @@ import { Rating } from "react-native-elements";
 import { useEffect, useState } from "react";
 import { getReviews } from "../service/fetchDataReview";
 import { getBarbershopById } from "../service/fetchDataBarberShop";
-import { Linking } from "react-native";
 import { useSelector } from "react-redux";
 
 const dummyImage = [
@@ -61,8 +61,6 @@ export default function BarbershopProfileScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
   const dataProfile = useSelector((state) => state.profileData.profileData);
-  console.log("Data: ", dataProfile);
-  // console.log("Data: ", barbershop.id);
 
   const fetchData = async () => {
     try {
@@ -86,14 +84,13 @@ export default function BarbershopProfileScreen({ route, navigation }) {
     setRefresh(true);
     fetchData();
   };
+
   const handleBookNow = () => {
     if (!dataProfile.firstName || !dataProfile.surname) {
       alert("Please update your profile to book an appointment.");
-    }else{
+    } else {
       navigation.navigate("Appointment", { barbershop });
     }
-      
-    
   };
 
   if (loading) {
@@ -123,14 +120,12 @@ export default function BarbershopProfileScreen({ route, navigation }) {
             <Text className="text-zinc-200 text-xl">Back</Text>
           </View>
 
-          <View className="flex flex-col bg-black p-2">
-            {/* Barbershop Information */}
+          {/* Barbershop Information */}
+          <View className="flex-col bg-black p-2">
             <View className="flex-col items-center rounded-lg p-2 bg-zinc-900 my-2">
               <Image
                 source={{
-                  uri:
-                    "http://10.10.102.48:8085" +
-                    barbershop.barbershop_profile_picture_id.path,
+                  uri: `http://10.10.102.48:8085${barbershop.barbershop_profile_picture_id.path}`,
                 }}
                 style={{ width: 90, height: 90 }}
                 className="rounded-lg"
@@ -147,10 +142,7 @@ export default function BarbershopProfileScreen({ route, navigation }) {
                   <Text className="text-zinc-400">
                     {barbershop.street_address}
                   </Text>
-                  <Text className="text-zinc-400">
-                    {barbershop.city}, {barbershop.state_province_region},{" "}
-                    {barbershop.postal_zip_code}, {barbershop.country}
-                  </Text>
+                  <Text className="text-zinc-400">{`${barbershop.city}, ${barbershop.state_province_region}, ${barbershop.postal_zip_code}, ${barbershop.country}`}</Text>
                 </View>
               </View>
             </View>
@@ -173,7 +165,6 @@ export default function BarbershopProfileScreen({ route, navigation }) {
             </TouchableOpacity>
             <View className="flex-row mt-2 justify-around items-center rounded-lg p-2 bg-zinc-900">
               <View className="items-center">
-                {/* Description */}
                 <Text className="text-zinc-400 p-2">Description</Text>
                 <Text className="text-zinc-200 p-2">
                   {toTitleCase(barbershop.description)}
@@ -187,10 +178,7 @@ export default function BarbershopProfileScreen({ route, navigation }) {
                 Gallery
               </Text>
               <View className="bg-zinc-900 p-2 rounded-lg">
-                <ScrollView
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-                >
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {dummyImage.map((image) => (
                     <Image
                       key={image.id}
@@ -287,46 +275,45 @@ export default function BarbershopProfileScreen({ route, navigation }) {
               </View>
             </View>
 
-            {/* User Reviews */}
-            <View className="bg-black min-h-screen">
-              <Text className="text-zinc-400 px-1 font-bold mb-2">
-                User Reviews
+            {/* Reviews */}
+            <View className="bg-black mb-9">
+              <Text className="text-zinc-400 px-1 font-bold mb-2 mt-2">
+                Reviews
               </Text>
               <View className="bg-zinc-900 p-2 rounded-lg">
-                <ScrollView>
-                  {reviews.map((item) => (
-                    <View
-                      key={item.id}
-                      className="bg-zinc-900  flex flex-col mb-4"
-                    >
-                      <View className="flex-row items-center justify-between">
-                        <Image
-                          source={{ uri: item.profile_image }}
-                          alt="user profile"
-                          className="w-10 h-10 rounded-md"
-                        />
-                        <Text className="text-zinc-200 ml-2">{item.name}</Text>
-                        <Text className="text-zinc-400 ml-2">{item.date}</Text>
-                      </View>
-                      <View className="flex-row mt-2">
-                        <Rating
-                          type="star"
-                          ratingCount={5}
-                          imageSize={20}
-                          readonly
-                          startingValue={item.rating}
-                          tintColor="#18181b"
-                        />
-                      </View>
-                      <Text className="text-zinc-200 mt-2">{item.comment}</Text>
+                {reviews.map((item) => (
+                  <View
+                    key={item.id}
+                    className="bg-zinc-900  flex flex-col mb-4"
+                  >
+                    <View className="flex-row items-center justify-between">
+                      <Image
+                        source={{ uri: item.profile_image }}
+                        alt="user profile"
+                        className="w-10 h-10 rounded-md"
+                      />
+                      <Text className="text-zinc-200 ml-2">{item.name}</Text>
+                      <Text className="text-zinc-400 ml-2">{item.date}</Text>
                     </View>
-                  ))}
-                </ScrollView>
+                    <View className="flex-row mt-2">
+                      <Rating
+                        type="star"
+                        ratingCount={5}
+                        imageSize={20}
+                        readonly
+                        startingValue={item.rating}
+                        tintColor="#18181b"
+                      />
+                    </View>
+                    <Text className="text-zinc-200 mt-2">{item.comment}</Text>
+                  </View>
+                ))}
               </View>
             </View>
           </View>
         </View>
       </ScrollView>
+      {/* Booking Button */}
       <TouchableOpacity
         className="absolute bottom-0 right-0 left-0 bg-opacity-100 bg-zinc-200 p-3 mx-2 rounded-lg"
         onPress={handleBookNow}

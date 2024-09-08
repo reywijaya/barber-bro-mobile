@@ -10,15 +10,16 @@ import {
 } from "@expo/vector-icons";
 import React from "react";
 import UserAvatar from "react-native-user-avatar";
+import { logout } from "../store/users";
 
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.loggedInUser);
+  // const user = useSelector((state) => state.user.loggedInUser);
   const profile = useSelector((state) => state.profileData.profileData);
-  console.log(profile);
+  // console.log(profile);
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("loggedInUser");
-    dispatch({ type: "LOGOUT" });
+    await AsyncStorage.removeItem("rememberedUser");
+    dispatch(logout());
     navigation.navigate("Login");
   };
   const handleHistory = () => {

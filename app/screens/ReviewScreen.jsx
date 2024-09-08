@@ -9,6 +9,7 @@ import {
   Modal,
   Button,
   Linking,
+  Alert, // Import Alert
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +33,7 @@ const formatPrice = (price) => {
     minimumFractionDigits: 2,
   }).format(price);
 };
+
 export const ReviewScreen = ({ navigation }) => {
   const userData = useSelector((state) => state.profileData.profileData);
   const user = useSelector((state) => state.user.loggedInUser);
@@ -67,9 +69,19 @@ export const ReviewScreen = ({ navigation }) => {
       // Handle payment
       handlePayment(response.data.data);
 
+      // Show success alert
+      Alert.alert("Booking Successful", "Your booking has been confirmed.", [
+        { text: "OK", onPress: () => navigation.navigate("History") },
+      ]);
+
       console.log("Booking successful");
     } catch (error) {
       console.error(error.response.data);
+
+      // Show error alert
+      Alert.alert("Booking Failed", "There was an issue with your booking. Please try again later.", [
+        { text: "OK" },
+      ]);
     }
   };
 
@@ -77,10 +89,6 @@ export const ReviewScreen = ({ navigation }) => {
     Linking.openURL(data.midtrans_payment_url);
 
     dispatch(setListBookingById(data));
-
-    setTimeout(() => {
-      navigation.navigate("History");
-    }, 2000);
 
     console.log("Payment successful");
   };
@@ -219,7 +227,7 @@ export const ReviewScreen = ({ navigation }) => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-          <View className="bg-white p-4 rounded-md w-80">
+          <View className="bg-zinc-200 p-4 rounded-md w-80">
             <Text className="text-lg font-bold mb-4">Confirm Booking</Text>
             <Text className="mb-4">
               Are you sure you want to book this appointment?

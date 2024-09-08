@@ -5,7 +5,6 @@ import { ScrollView, View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axiosInstance from "../service/axios";
 
-
 const formatPrice = (price) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -15,8 +14,9 @@ const formatPrice = (price) => {
 };
 
 const toTitleCase = (str) =>
-  str.replace(/\w\S*/g, (txt) =>
-    txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+  str.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
   );
 
 const DetailsBookingScreen = ({ route, navigation }) => {
@@ -66,7 +66,9 @@ const DetailsBookingScreen = ({ route, navigation }) => {
             <View className="mb-4 bg-zinc-800 p-4 rounded-lg">
               <Image
                 source={{
-                  uri: `http://10.10.102.48:8085${barber.barbershop_profile_picture_id?.path || ""}`,
+                  uri: `http://10.10.102.48:8085${
+                    barber.barbershop_profile_picture_id?.path 
+                  }`,
                 }}
                 className="w-full h-40 rounded-md mb-4"
                 style={{ resizeMode: "cover" }}
@@ -85,9 +87,14 @@ const DetailsBookingScreen = ({ route, navigation }) => {
 
           {/* Booking Details */}
           <View className="mb-4 bg-zinc-800 p-4 rounded-lg">
-            <Text className="text-white font-bold text-lg">Booking Details</Text>
+            <Text className="text-white font-bold text-lg">
+              Booking Details
+            </Text>
             <Text className="text-zinc-400 text-sm mt-2">
-              Date: {booking_date ? new Date(booking_date).toLocaleDateString() : "N/A"}
+              Date:{" "}
+              {booking_date
+                ? new Date(booking_date).toLocaleDateString()
+                : "N/A"}
             </Text>
             <Text className="text-zinc-400 text-sm">
               Time: {booking_time || "N/A"}

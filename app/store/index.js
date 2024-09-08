@@ -16,7 +16,6 @@ const store= configureStore({
         profileData: profileDataReducer,
         appointment: appointmentReducer,
         listBookingUser: listBookingUserReducer,
-        
     }
 })
 

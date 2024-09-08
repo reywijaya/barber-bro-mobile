@@ -27,11 +27,12 @@ const Stack = createNativeStackNavigator();
 const AppNavigator = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-
+  const dispatch = useDispatch();
   const checkLoggedInUser = async () => {
     try {
-      const loggedInUser = await AsyncStorage.getItem("loggedInUser");
+      const loggedInUser = await AsyncStorage.getItem("rememberedUser");
       setUser(JSON.parse(loggedInUser));
+      dispatch(login(JSON.parse(loggedInUser)));
     } catch (error) {
       console.error(
         "Failed to load user data from AsyncStorage:",

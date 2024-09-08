@@ -7,7 +7,6 @@ import {
   Image,
   RefreshControl,
   ImageBackground,
-  Alert,
 } from "react-native";
 import { SearchBar } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,128 +17,114 @@ import { getBarbershop } from "../service/fetchDataBarberShop";
 import { getBarbershops } from "../store/barbershops";
 import { getDataProfile } from "../service/fetchDataProfile";
 import axiosInstance from "../service/axios";
+import { login } from "../store/users";
 
+// Fungsi Utilitas untuk Sort
 const sortByDistance = (data, order) => {
-  return data.sort((a, b) => {
-    if (order === "nearest") {
-      return a.distance_km - b.distance_km;
-    } else if (order === "farthest") {
-      return b.distance_km - a.distance_km;
-    }
-    return 0;
-  });
+  return data.sort((a, b) =>
+    order === "nearest"
+      ? a.distance_km - b.distance_km
+      : b.distance_km - a.distance_km
+  );
 };
 
 const sortByRating = (data, order) => {
-  return data.sort((a, b) => {
-    if (order === "highest") {
-      return b.average_rating - a.average_rating;
-    } else if (order === "lowest") {
-      return a.average_rating - b.average_rating;
-    }
-    return 0;
-  });
+  return data.sort((a, b) =>
+    order === "highest"
+      ? b.average_rating - a.average_rating
+      : a.average_rating - b.average_rating
+  );
 };
 
 const sortBarbershopData = (data, sortDistance, sortRating) => {
   let sortedData = [...data];
-  if (sortDistance) {
-    sortedData = sortByDistance(sortedData, sortDistance);
-  }
-  if (sortRating) {
-    sortedData = sortByRating(sortedData, sortRating);
-  }
+  if (sortDistance) sortedData = sortByDistance(sortedData, sortDistance);
+  if (sortRating) sortedData = sortByRating(sortedData, sortRating);
   return sortedData;
 };
 
 const toTitleCase = (str) => {
-  if (typeof str !== "string") {
-    return str;
-  }
+  if (typeof str !== "string") return str;
   return str.replace(
     /\w\S*/g,
     (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
   );
 };
 
+// Komponen Utama HomeScreen
 const HomeScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser);
-  const dataProfile = useSelector((state) => state.profileData.profileData);
   const [dataNearbyBarbershop, setDataNearbyBarbershop] = useState([]);
-  // console.log("nearbyBarbershop", dataNearbyBarbershop);
   const [sortDistance, setSortDistance] = useState("");
   const [sortRating, setSortRating] = useState("");
 
+  // Fungsi untuk Mendapatkan Data Barbershop
   const fetchBarbershopData = async () => {
     const data = await getBarbershop();
     dispatch(getBarbershops(data));
     getDataProfile(dispatch, user.token);
   };
 
+  // Fungsi untuk Memuat Data Pengguna
   const loadUserData = async () => {
     try {
-      const storedUserData = await AsyncStorage.getItem("loggedInUser");
-      if (storedUserData) {
-        const userData = JSON.parse(storedUserData);
-        Alert.alert("Welcome", `Welcome back, ${userData.email}!`);
-      }
+      const token = await AsyncStorage.getItem("token");
+      const userData = await AsyncStorage.getItem("rememberedUser");
+      if (!token) navigation.navigate("Login");
+      dispatch(login(JSON.parse(userData)));
+      alert("Welcome back, " + user.email);
     } catch (error) {
       console.error("Failed to load user data from AsyncStorage:", error);
     }
   };
 
-  const updateSearch = (search) => {
-    setSearch(search);
+  // Fungsi untuk Mengambil Data Barbershop Terdekat
+  const apiNearbyBarbershop = async (latitude, longitude) => {
+    try {
+      const res = await axiosInstance.get(
+        `/barbers/nearby?latitude=${latitude}&longitude=${longitude}`
+      );
+      setDataNearbyBarbershop(res.data.data);
+    } catch (error) {
+      console.log("Error fetching nearby barbershops:", error.response.data);
+    }
   };
 
+  // Efek Samping saat Komponen Pertama Kali Dimuat
+  useEffect(() => {
+    const latitude = -7.93476752; // Latitude Enigmacamp Malang
+    const longitude = 112.60261667; // Longitude Enigmacamp Malang
+
+    fetchBarbershopData();
+    loadUserData();
+    apiNearbyBarbershop(latitude, longitude);
+  }, [dispatch]);
+
+  // Fungsi Penyegaran Data
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchBarbershopData();
+    setRefreshing(false);
+  };
+
+  // Fungsi untuk Memperbarui Data Pencarian
+  const updateSearch = (search) => setSearch(search);
+
+  // Penyaringan dan Pengurutan Data Barbershop
   const filteredBarbershopData = useMemo(() => {
     let filteredData = dataNearbyBarbershop;
-
-    // Filter data based on search
     if (search) {
       filteredData = filteredData.filter((item) =>
         item.name.toLowerCase().includes(search.toLowerCase())
       );
     }
-
-    // Sort data based on sortDistance and sortRating
-    filteredData = sortBarbershopData(filteredData, sortDistance, sortRating);
-
-    return filteredData;
+    return sortBarbershopData(filteredData, sortDistance, sortRating);
   }, [search, dataNearbyBarbershop, sortDistance, sortRating]);
- // Latitude and longitude of Enigmacamp Malang
- const latitude = -7.93476752;
- const longitude = 112.60261667;
 
- const apiNearbyBarbershop = async (latitude, longitude) => {
-   try {
-     const res = await axiosInstance.get(
-       `/barbers/nearby?latitude=${latitude}&longitude=${longitude}`
-     );
-     setDataNearbyBarbershop(res.data.data);
-   } catch (error) {
-     console.log("Error fetching nearby barbershops:", error.response.data);
-   }
- };
-
- useEffect(() => {
-   fetchBarbershopData();
-   loadUserData();
-   apiNearbyBarbershop(latitude, longitude);
- }, [dispatch]);
- 
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    const data = await getBarbershop();
-    dispatch(getBarbershops(data));
-    getDataProfile(dispatch, user.token);
-    setRefreshing(false);
-  };
-
+  console.log(filteredBarbershopData);
   return (
     <SafeAreaView className="flex-1 mt-7 bg-black">
       <View className="px-5">
@@ -207,9 +192,7 @@ const HomeScreen = ({ navigation }) => {
             <View className="rounded-lg items-center">
               <ImageBackground
                 source={{
-                  uri:
-                    "http://10.10.102.48:8085" +
-                    item.barbershop_profile_picture_id.path,
+                  uri: `http://10.10.102.48:8085${item.barbershop_profile_picture_id.path}`,
                 }}
                 style={{ height: 180, width: 280 }}
                 imageStyle={{ opacity: 0.7, borderRadius: 10 }}
@@ -250,21 +233,13 @@ const HomeScreen = ({ navigation }) => {
               <View className="flex flex-row items-center shadow-lg">
                 <Image
                   source={{
-                    uri:
-                      "http://10.10.102.48:8080" +
-                      item.barbershop_profile_picture_id.path,
+                    uri: `http://10.10.102.48:8085${item.barbershop_profile_picture_id.path}`,
                   }}
-                  className="w-10 h-10 rounded-full"
-                  resizeMode="cover"
+                  className="h-10 w-10 rounded-full shadow-lg"
                 />
-                <View className="ml-4 flex flex-col">
-                  <Text className="text-xl text-white font-bold">
-                    {toTitleCase(item.name)}
-                  </Text>
-                  <Text className="text-white text-xs">
-                    {toTitleCase(item.address)}
-                  </Text>
-                </View>
+                <Text className="font-bold text-base text-white ml-4">
+                  {toTitleCase(item.name)}
+                </Text>
               </View>
             </View>
             <View className="flex flex-row justify-center px-5">
