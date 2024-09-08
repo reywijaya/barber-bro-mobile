@@ -25,12 +25,13 @@ const TabNavigator = () => {
 
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: "#e4e4e7",
+                tabBarActiveTintColor: "#27272a",
                 tabBarStyle: {
-                    backgroundColor: "#18181b",
+                    backgroundColor: "#e4e4e7",
                     borderTopColor: "transparent",
                     height: 50,
                     paddingTop: 5,
+                    paddingBottom: 5,
                 },
                 tabBarLabelStyle: {
                     fontSize: 12,
@@ -53,7 +54,7 @@ const TabNavigator = () => {
                 component={HistoryScreen}
                 options={{
                     tabBarIcon: ({ focused, color, size }) => (
-                        <Ionicons name="calendar-outline" size={size} color={color} />
+                        <Ionicons name="calendar" size={size} color={color} />
                     ),
                 }}
             />

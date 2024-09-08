@@ -1,7 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   Alert,
-  Image,
   Pressable,
   ScrollView,
   Text,
@@ -12,6 +11,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import axiosInstance from "../service/axios";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Toast, ALERT_TYPE, Dialog } from "react-native-alert-notification";
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -36,24 +37,41 @@ export default function RegisterScreen({ navigation }) {
 
   const handleSubmit = async () => {
     if (!email || !password || !confirmPassword) {
-      Alert.alert("Error", "All fields are required.");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "All fields are required.",
+        autoClose: 2000,
+      })
       return;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Please enter a valid email address.",
+        autoClose: 2000,
+      })
       return;
     }
     const passwordRegex =
       /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
     if (!passwordRegex.test(password)) {
-      Alert.alert(
-        "Error",
-        "Password must be at least 8 characters long, start with a capital letter, and contain at least one number."
-      );
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Password must be at least 8 characters long, start with a capital letter, and contain at least one number.",
+        autoClose: 2000,
+      })
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Passwords do not match.",
+        autoClose: 2000,
+      })
       return;
     }
 
@@ -66,89 +84,101 @@ export default function RegisterScreen({ navigation }) {
     try {
       const response = await axiosInstance.post("/customer/register", data);
       setData(response.data);
-      Alert.alert("Success", "Registration Successful!");
+      Dialog.show({
+        type: ALERT_TYPE.SUCCESS,
+        title: "Success",
+        textBody: "Registration successful. Please check your email for verification.",
+        autoClose: 2000,
+      });
       navigation.navigate("Login");
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", "Failed to register. Please try again.");
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "Failed to register. Please try again.",
+        autoClose: 2000,
+      })
+      return;
     }
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-black ">
-      <ScrollView horizontal={false} className="h-screen">
-        <View className="items-center">
-          <Image
-            source={require("../../assets/Gold.png")}
-            className="w-36 h-36"
-          />
-        </View>
-        <View className="gap-2 items-center">
-          <Text className="text-white font-bold text-3xl">Sign up</Text>
-          <Text className="text-white">
-            Sign up now and unlock exclusive access
-          </Text>
-        </View>
-        <View className="gap-3 my-4 px-4">
-          <TextInput
-            placeholder="Email"
-            placeholderTextColor="#6b7280"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            className="bg-gray-800 p-3 rounded text-white text-lg"
-            keyboardType="email-address"
-          />
-
-          <View className="flex-row items-center bg-gray-800 p-3 rounded">
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!isPasswordVisible}
-              className="text-white text-lg flex-1"
-              placeholder="Password"
-              placeholderTextColor="#6b7280"
-            />
-            <Pressable onPress={togglePasswordVisibility}>
-              <MaterialCommunityIcons
-                name={isPasswordVisible ? "eye-off" : "eye"}
-                size={24}
-                color="white"
-              />
-            </Pressable>
+    <SafeAreaView>
+      <ScrollView>
+        <View className="flex flex-col min-h-screen p-8">
+          <View className="flex-row items-center gap-x-2">
+            <MaterialIcons name="join-left" size={30} color="black" />
+            <Text className="text-xl">Sign up</Text>
           </View>
-
-          <View className="flex-row items-center bg-gray-800 p-3 rounded">
-            <TextInput
-              placeholder="Confirm Password"
-              placeholderTextColor="#6b7280"
-              value={confirmPassword}
-              onChangeText={(text) => setConfirmPassword(text)}
-              className="text-white text-lg flex-1"
-              secureTextEntry={!isConfirmPasswordVisible}
-            />
-            <Pressable onPress={toggleConfirmPasswordVisibility}>
-              <MaterialCommunityIcons
-                name={isConfirmPasswordVisible ? "eye-off" : "eye"}
-                size={24}
-                color="white"
-              />
-            </Pressable>
+          <View className="my-10">
+            <Text className="text-3xl font-bold">Sign up now to unlock exclusive offers and discounts.</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text className="my-2">
+                Already have an account?{" "}
+                <Text className="font-bold text-blue-500">
+                  Sign in
+                </Text>
+              </Text>
+            </TouchableOpacity>
           </View>
-
-          <View className="h-[1px] bg-gray-700 my-2" />
+          <View className="gap-y-2 mb-2">
+            <Text>Email</Text>
+            <TextInput
+              placeholder="Email"
+              placeholderTextColor="#a1a1aa"
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+              className="py-3 px-4 rounded-full text-lg bg-zinc-200 focus:border-2 focus:border-zinc-600"
+              keyboardType="email-address"
+            />
+          </View>
+          <View className="gap-y-2 mb-2">
+            <Text>Password</Text>
+            <View className="flex-row items-center py-3 px-4 rounded-full text-lg bg-zinc-200 focus:border-2 focus:border-zinc-600">
+              <TextInput
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!isPasswordVisible}
+                className="text-white text-lg flex-1"
+                placeholder="Password"
+                placeholderTextColor="#6b7280"
+              />
+              <Pressable onPress={togglePasswordVisibility}>
+                <MaterialCommunityIcons
+                  name={isPasswordVisible ? "eye-off" : "eye"}
+                  size={24}
+                  color="#18181b"
+                />
+              </Pressable>
+            </View>
+          </View>
+          <View className="gap-y-2 mb-2">
+            <Text>Confirm Password</Text>
+            <View className="flex-row items-center py-3 px-4 rounded-full text-lg bg-zinc-200 focus:border-2 focus:border-zinc-600">
+              <TextInput
+                placeholder="Confirm Password"
+                placeholderTextColor="#6b7280"
+                value={confirmPassword}
+                onChangeText={(text) => setConfirmPassword(text)}
+                className="text-white text-lg flex-1"
+                secureTextEntry={!isConfirmPasswordVisible}
+              />
+              <Pressable onPress={toggleConfirmPasswordVisibility}>
+                <MaterialCommunityIcons
+                  name={isConfirmPasswordVisible ? "eye-off" : "eye"}
+                  size={24}
+                  color="#18181b"
+                />
+              </Pressable>
+            </View>
+          </View>
+          <View className="h-[1px] bg-zinc-600 my-2" />
           <TouchableOpacity
             onPress={handleSubmit}
-            className="bg-white py-2 rounded my-2"
+            className="bg-zinc-800 py-3 rounded-full my-2"
           >
-            <Text className="font-bold text-lg text-center">Sign Up</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Login")}
-            className="bg-gray-800 py-2 rounded my-2"
-          >
-            <Text className="font-bold text-white text-lg text-center">
-              Back to Sign In
-            </Text>
+            <Text className="font-bold text-lg text-center text-zinc-200">Sign Up</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

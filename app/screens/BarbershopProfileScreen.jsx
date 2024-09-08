@@ -89,11 +89,11 @@ export default function BarbershopProfileScreen({ route, navigation }) {
   const handleBookNow = () => {
     if (!dataProfile.firstName || !dataProfile.surname) {
       alert("Please update your profile to book an appointment.");
-    }else{
+    } else {
       navigation.navigate("Appointment", { barbershop });
     }
-      
-    
+
+
   };
 
   if (loading) {
@@ -105,12 +105,8 @@ export default function BarbershopProfileScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView className="flex-1">
-      <ScrollView
-        className="flex-1"
-        refreshing={refresh}
-        onRefresh={handleRefresh}
-      >
+    <SafeAreaView>
+      <ScrollView>
         <View>
           {/* Back Button and Header */}
           <View className="flex-row bg-zinc-900 p-2 items-center gap-3">

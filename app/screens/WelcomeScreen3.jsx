@@ -18,10 +18,10 @@ export default function WelcomeScreen3({navigation}) {
                 </View>
                 <View className="flex flex-col w-full gap-y-4">
                     <TouchableOpacity
-                        className="rounded-full bg-zinc-800 h-12 py-3"
+                        className="rounded-full border-2 border-zinc-800 bg-zinc-800 h-12 py-3"
                         onPress={() => navigation.navigate("Login")}
                     >
-                        <Text className="text-zinc-200 font-bold text-center">Log in</Text>
+                        <Text className="text-zinc-200 font-bold text-center">Sign in</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         className="rounded-full border-2 border-zinc-800 h-12 py-3"

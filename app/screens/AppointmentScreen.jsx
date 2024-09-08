@@ -215,24 +215,22 @@ export default function AppointmentScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView className="flex-1">
-      <ScrollView
-        className="flex-1"
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-      >
-        {/* Back Button and Header */}
-        <View className="flex-row bg-zinc-800 p-2 items-center gap-3">
+    <SafeAreaView>
+      <ScrollView refreshing={refreshing} onRefresh={onRefresh}>
+        <View>
+
+        </View>
+        <View className="flex-row p-2 items-center gap-3">
           <Ionicons
             name="arrow-back"
             size={20}
             color="#e4e4e7"
             onPress={() => navigation.goBack()}
           />
-          <Text className="text-zinc-200 text-xl">Back</Text>
+          <Text className=" text-xl">Back</Text>
         </View>
 
-        <View className="bg-zinc-900 p-2 ">
+        <View className=" p-2 ">
           {/* Barbershop Header */}
           <View className="mb-4">
             <ImageBackground
@@ -245,7 +243,7 @@ export default function AppointmentScreen({ route, navigation }) {
               style={{ opacity: 0.8 }}
             >
               {/* Gradient overlay for better text readability */}
-              <View className="absolute top-0 left-0 right-0 bottom-0 bg-black/60" />
+              <View className="absolute top-0 left-0 right-0 bottom-0" />
 
               <View className="absolute bottom-0 left-0 right-0 p-4">
                 <View className="flex-row items-center">
@@ -259,7 +257,7 @@ export default function AppointmentScreen({ route, navigation }) {
                     style={{ resizeMode: "cover", opacity: 1 }}
                   />
                   <View className="ml-4">
-                    <Text className="text-white font-bold text-base shadow-lg border-b border-collapse">
+                    <Text className=" font-bold text-base shadow-lg border-b border-collapse">
                       {barbershop.name || "No Name Available"}
                     </Text>
                     <View className="mt-2">
@@ -267,7 +265,7 @@ export default function AppointmentScreen({ route, navigation }) {
                         barbershop.operational_hours.map((hour, index) => (
                           <Text
                             key={index}
-                            className="text-white text-xs shadow-md"
+                            className="text-xs shadow-md"
                           >
                             {toTitleCase(hour.day)}:{" "}
                             {hour.opening_time.substring(0, 5)} -{" "}
@@ -275,7 +273,7 @@ export default function AppointmentScreen({ route, navigation }) {
                           </Text>
                         ))
                       ) : (
-                        <Text className="text-zinc-300 text-xs">Closed</Text>
+                        <Text className=" text-xs">Closed</Text>
                       )}
                     </View>
                   </View>
@@ -286,7 +284,7 @@ export default function AppointmentScreen({ route, navigation }) {
 
           {/* Service Selection */}
           <View className="mb-4">
-            <Text className="text-zinc-400 font-bold text-base">
+            <Text className=" font-bold text-base">
               Choose Service
             </Text>
             <View className="mt-2">
@@ -294,14 +292,13 @@ export default function AppointmentScreen({ route, navigation }) {
                 <TouchableOpacity
                   key={id}
                   onPress={() => handleServiceChange(id)}
-                  className={`p-4 mb-2 rounded-lg ${
-                    selectedServiceId === id ? "bg-zinc-600" : "bg-zinc-800"
-                  }`}
+                  className={`p-4 mb-2 rounded-lg ${selectedServiceId === id ? "bg-zinc-600" : "bg-zinc-800"
+                    }`}
                 >
-                  <Text className="text-zinc-200 font-semibold text-lg">
+                  <Text className=" font-semibold text-lg">
                     {label}
                   </Text>
-                  <Text className="text-zinc-400">{formatPrice(price)}</Text>
+                  <Text className="">{formatPrice(price)}</Text>
                 </TouchableOpacity>
               ))}
             </View>
