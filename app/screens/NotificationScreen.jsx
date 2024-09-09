@@ -58,75 +58,17 @@ const NotificationScreen = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-zinc-100">
-      <View className="bg-zinc-100 p-4 flex-row items-center border-solid border border-zinc-900">
-        <Ionicons
-          name="arrow-back-outline"
-          size={24}
-          color="black"
-          onPress={() => navigation.goBack()}
-        />
-        <Text className="text-zinc-900 font-bold text-lg ml-2">
-          Notifications
-        </Text>
-        <FontAwesome5
-          name="bell"
-          size={24}
-          color="black"
-          style={{ marginLeft: "auto" }}
-        />
-      </View>
-      <ScrollView className="flex-1 bg-zinc-100" showsVerticalScrollIndicator={false}>
-        {notifications.length === 0 ? (
-          <View className="flex-1 justify-center items-center">
-            <Text className="text-zinc-300 text-lg">No notifications</Text>
-          </View>
-        ) : (
-          notifications.map((notification, index) => (
-            <View
-              key={index}
-              className="bg-zinc-800 p-4 rounded-md m-2 flex-row items-start shadow-lg shadow-zinc-900/50"
-            >
-              <Image
-                source={{
-                  uri: `http://10.10.102.48:8085${notification.barber.barbershop_profile_picture_id?.path}`,
-                }}
-                className="w-16 h-16 rounded-full"
-                resizeMode="cover"
-              />
-              <View className="ml-4 flex-1">
-                <Text className="text-zinc-300 text-lg font-bold">
-                  {notification.barber.name}
-                </Text>
-                <Text className="text-zinc-400 text-sm mt-1">
-                  {notification.barber.street_address}, {notification.barber.city}
-                </Text>
-                <Text className="text-zinc-400 text-sm mt-1">
-                  {notification.customer.firstName} {notification.customer.surname}
-                </Text>
-                <Text className="text-zinc-400 text-xs mt-1">
-                  {new Date(notification.booking_date).toLocaleDateString()} 
-                </Text>
-                <Text className="text-zinc-400 text-xs mt-1">
-                  Status: {toTitleCase(notification.status)} 
-                </Text>
-                <Text className="text-zinc-400 text-xs mt-1">
-                  Total Price: {formatPrice(notification.total_price)}
-                </Text>
-              </View>
-              <View className="ml-4 flex-row items-center">
-                <Ionicons
-                  name="time-outline"
-                  size={20}
-                  color="#e4e4e7"
-                />
-                <Text className="text-zinc-300 text-xs ml-1">
-                {notification.booking_time}
-                </Text>
-              </View>
-            </View>
-          ))
-        )}
+    <SafeAreaView>
+      <ScrollView>
+        <View className="flex-col items-center justify-center min-h-screen">
+          <Image
+            source={require("../../assets/lazy.png")}
+            style={{ width: 200, height: 200 }}
+          />
+          <Text className="text-zinc-900 text-lg font-bold text-center">
+            Oops.. Under construction!
+          </Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

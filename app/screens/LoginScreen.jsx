@@ -89,6 +89,7 @@ export const LoginScreen = ({ navigation }) => {
           textBody: "Login failed, please check your email or password",
           autoClose: 2000,
         })
+        navigation.navigate("Tab", { screen: "Home" });
       }
     } catch (error) {
       console.log("error:", error.response?.data || error.message);

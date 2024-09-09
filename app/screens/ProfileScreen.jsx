@@ -38,7 +38,7 @@ export default function ProfileScreen({ navigation }) {
             />
             <View className="flex-row items-center gap-x-2">
               <Text className="font-black text-3xl">{user.email.split("@")[0]}</Text>
-              <Feather name="edit-3" size={22} color="#9ca3af" onPress={() => navigation.navigate("EditProfile")}/>
+              <Feather name="edit-3" size={22} color="#9ca3af" onPress={() => navigation.navigate("EditProfile")} />
             </View>
           </View>
 
@@ -57,7 +57,9 @@ export default function ProfileScreen({ navigation }) {
             </View>
           </View>
 
-          <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
+          <TouchableOpacity
+            onPress={() => navigation.navigate("EditProfile")}
+            className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
             <View className="flex-row items-center gap-2">
               <MaterialCommunityIcons
                 name="account-circle-outline"
@@ -71,11 +73,11 @@ export default function ProfileScreen({ navigation }) {
                 name="arrow-right"
                 size={24}
                 color="#27272a"
-                onPress={() => navigation.navigate("EditProfile")}
               />
             </View>
-          </View>
-          <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
             <View className="flex-row items-center gap-2">
               <Ionicons
                 name="notifications-outline"
@@ -89,11 +91,11 @@ export default function ProfileScreen({ navigation }) {
                 name="arrow-right"
                 size={24}
                 color="#27272a"
-                onPress={() => navigation.navigate("Notification")}
               />
             </View>
-          </View>
-          <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
             <View className="flex-row items-center gap-2">
               <MaterialIcons name="security" size={24} color="#27272a" />
               <Text className="text-lg font-semibold">Security & Privacy</Text>
@@ -103,11 +105,10 @@ export default function ProfileScreen({ navigation }) {
                 name="arrow-right"
                 size={24}
                 color="#27272a"
-                onPress={() => navigation.navigate("PrivacyPolicy")}
               />
             </View>
-          </View>
-          <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
+          </TouchableOpacity>
+          <TouchableOpacity className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
             <View className="flex-row items-center gap-2">
               <Ionicons name="heart-outline" size={24} color="#27272a" />
               <Text className="text-lg font-semibold">Liked Barbershop</Text>
@@ -115,36 +116,36 @@ export default function ProfileScreen({ navigation }) {
             <View>
               <Feather name="arrow-right" size={24} color="#27272a" />
             </View>
-          </View>
-          <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleHistory} className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
             <View className="flex-row items-center gap-2">
               <Ionicons name="calendar-outline" size={24} color="#27272a" />
               <Text className="text-lg font-semibold">Booking History</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#27272a" onPress={handleHistory} />
+              <Feather name="arrow-right" size={24} color="#27272a" />
             </View>
-          </View>
+          </TouchableOpacity>
           <Text className="py-2">More info and support</Text>
-          <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
+          <TouchableOpacity className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
             <View className="flex-row items-center gap-2">
               <Ionicons name="information-circle-outline" size={26} color="#27272a" />
               <Text className="text-lg font-semibold">About</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#27272a" onPress={() => navigation.navigate("About")} />
+              <Feather name="arrow-right" size={24} color="#27272a" />
             </View>
-          </View>
-          <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
+          </TouchableOpacity>
+          <TouchableOpacity className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
             <View className="flex-row items-center gap-2">
               <Ionicons name="help-circle-outline" size={26} color="#27272a" />
               <Text className="text-lg font-semibold">Help Center</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#27272a" onPress={() => navigation.navigate("HelpCenter")} />
+              <Feather name="arrow-right" size={24} color="#27272a" />
             </View>
-          </View>
-          <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
+          </TouchableOpacity>
+          <TouchableOpacity className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
             <View className="flex-row items-center gap-2">
               <MaterialIcons name="security" size={24} color="#27272a" />
               <Text className="text-lg font-semibold">Privacy Policy</Text>
@@ -152,7 +153,7 @@ export default function ProfileScreen({ navigation }) {
             <View>
               <Feather name="arrow-right" size={24} color="#27272a" />
             </View>
-          </View>
+          </TouchableOpacity>
           <View className="flex-row items-center justify-center p-2 my-2 rounded-3xl border-2 border-red-200">
             <TouchableOpacity className="flex-row items-center gap-2" onPress={handleLogout}>
               <Ionicons name="exit-outline" size={26} color="#ef4444" />

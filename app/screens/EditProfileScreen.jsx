@@ -15,6 +15,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
 import { getDataProfile } from "../service/fetchDataProfile";
 import { setProfileData } from "../store/profileData";
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 
 export default function EditProfileScreen({ navigation }) {
   const user = useSelector((state) => state.user.loggedInUser);
@@ -84,8 +85,7 @@ export default function EditProfileScreen({ navigation }) {
       console.error("Update Error:", error.response?.data || error.message);
       Alert.alert(
         "Error",
-        `Failed to update profile. ${
-          error.response?.data?.error || "Please try again."
+        `Failed to update profile. ${error.response?.data?.error || "Please try again."
         }`
       );
     }
@@ -97,19 +97,19 @@ export default function EditProfileScreen({ navigation }) {
         id: "male",
         label: "Male",
         value: true,
-        color: "white",
-        selectedColor: "white",
-        unselectedColor: "white",
-        labelStyle: { color: "white" },
+        color: "black",
+        selectedColor: "black",
+        unselectedColor: "gray",
+        labelStyle: { color: "black" },
       },
       {
         id: "female",
         label: "Female",
         value: false,
-        color: "white",
-        selectedColor: "white",
-        unselectedColor: "white",
-        labelStyle: { color: "white" },
+        color: "black",
+        selectedColor: "black",
+        unselectedColor: "gray",
+        labelStyle: { color: "black" },
       },
     ],
     []
@@ -118,80 +118,75 @@ export default function EditProfileScreen({ navigation }) {
   return (
     <SafeAreaView>
       <ScrollView>
-        <View className="bg-black p-4">
-          <View className="gap-2 items-center">
-            <Text className="text-zinc-100 font-bold text-3xl">
-              Edit Profile
-            </Text>
+        <View className="flex flex-col p-8">
+          <View className="flex-row items-center justify-between">
+            <TouchableOpacity onPress={() => navigation.navigate("Tab")}>
+              <FontAwesome5 name="arrow-circle-left" size={24} color={"black"} />
+            </TouchableOpacity>
+            <Text className="font-bold text-lg w-2/3">Account Settings</Text>
           </View>
-          <View className="gap-3 my-4 px-4">
-            <View className="mb-4">
+
+          <View className="gap-y-4 my-4">
+            <View className="gap-y-2">
+              <Text>First Name</Text>
               <TextInput
                 placeholder="First Name"
                 placeholderTextColor="#a1a1aa"
                 value={firstName}
                 onChangeText={setFirstName}
-                className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
+                className="py-2 px-4 rounded-full border-2 border-zinc-200 text-lg focus:border-2 focus:border-zinc-500"
               />
             </View>
 
-            <View className="mb-4">
+            <View className="gap-y-2">
+              <Text>Surname</Text>
               <TextInput
                 placeholder="Surname"
                 placeholderTextColor="#a1a1aa"
                 value={surname}
                 onChangeText={setSurname}
-                className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
+                className="py-2 px-4 rounded-full border-2 border-zinc-200 text-lg focus:border-2 focus:border-zinc-500"
               />
             </View>
 
-            <View className="mb-4">
+            <View className="gap-y-2">
+              <Text>Phone Number</Text>
               <TextInput
-                placeholder="Phone"
+                placeholder="Phone Number"
                 placeholderTextColor="#a1a1aa"
                 value={phone}
                 onChangeText={setPhone}
-                className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
+                className="py-2 px-4 rounded-full border-2 border-zinc-200 text-lg focus:border-2 focus:border-zinc-500"
                 keyboardType="phone-pad"
               />
             </View>
 
-            <View className="mb-4">
+            <View className="gap-y-2">
+              <Text>Address</Text>
               <TextInput
                 placeholder="Address"
                 placeholderTextColor="#a1a1aa"
                 value={address}
                 onChangeText={setAddress}
-                className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
-              />
+                className="py-2 px-4 rounded-full border-2 border-zinc-200 text-lg focus:border-2 focus:border-zinc-500" />
             </View>
 
-            <View className="mb-4">
-              <TextInput
-                placeholder="About"
-                placeholderTextColor="#a1a1aa"
-                value={about}
-                onChangeText={setAbout}
-                className="bg-zinc-700 p-3 rounded text-zinc-100 text-lg"
-              />
-            </View>
-
-            <View className="mb-4">
+            <View className="gap-y-2">
+              <Text>Gender</Text>
               <RadioGroup
                 layout="row"
                 radioButtons={radioButtons}
                 onPress={(id) => setIsMale(id === "male")}
                 selectedId={isMale ? "male" : "female"}
-                className="flex-row"
               />
             </View>
 
-            <View className="mb-4">
+            <View className="gap-y-2">
               <Pressable
                 onPress={() => setShowDatePicker(true)}
-                className="bg-zinc-700 p-3 rounded"
+                className="py-2 px-4 rounded-full border-2 border-zinc-200 text-lg focus:border-2 focus:border-zinc-500"
               >
-                <Text className="text-zinc-100 text-lg">
+                <Text className="text-lg">
                   {dateOfBirth.toDateString()}
                 </Text>
               </Pressable>
@@ -206,22 +201,12 @@ export default function EditProfileScreen({ navigation }) {
               )}
             </View>
 
-            <View className="h-[1px] bg-zinc-700 my-2" />
-
             <TouchableOpacity
               onPress={handleSubmit}
-              className="bg-zinc-100 py-2 rounded my-2"
+              className="bg-zinc-800 rounded-full py-2 mt-2"
             >
-              <Text className="font-bold text-lg text-center">
+              <Text className="text-zinc-200 text-lg text-center">
                 Save Changes
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Tab")}
-              className="bg-zinc-800 py-2 rounded my-2"
-            >
-              <Text className="font-bold text-zinc-100 text-lg text-center">
-                Back to Profile
               </Text>
             </TouchableOpacity>
           </View>
