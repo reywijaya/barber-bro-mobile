@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text, View, RefreshControl } from "react-native";
+import { ScrollView, Text, View, RefreshControl, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../service/axios";
 import { setListBookingUser } from "../store/listBookingUser";
 import moment from "moment";
 import { TouchableOpacity } from "react-native";
+import { Entypo, Fontisto, Ionicons, MaterialIcons } from "@expo/vector-icons";
+
 const toTitleCase = (str) => {
   return str.replace(
     /\w\S*/g,
@@ -85,112 +87,105 @@ const HistoryScreen = ({ navigation }) => {
       ? listBooking
       : listBooking.filter((booking) => toTitleCase(booking.status) === selectedStatus);
 
-  return (
-    <SafeAreaView className="flex-1">
-      <View className="flex-1 bg-zinc-900">
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
-          className="p-4"
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
-          <View className="bg-zinc-800 p-4 rounded-lg mb-4">
-            <Text className="text-zinc-200 font-bold text-xl">History</Text>
-            <View className="border-b border-zinc-600 my-2"></View>
+  const colorStatus = (status) => {
+    switch (status) {
+      case "Pending":
+        return "text-amber-800 bg-amber-200";
+      case "Completed":
+        return "text-cyan-800 bg-cyan-200";
+      case "Settlement":
+        return "text-green-900 bg-green-300";
+      default:
+        return "text-zinc-900 bg-zinc-300";
+    }
+  };
 
-            {/* Filter Status */}
-            <View className="flex-row justify-around mb-4">
-              <TouchableOpacity
-                style={{ borderRadius: 8, width: 50, height: 40 }}
-                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "All" ? "bg-zinc-600" : ""}`}
-                onPress={() => filterBookings("All")}
-              >
-                <Text className="text-zinc-200">All</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{ borderRadius: 8, width: 60, height: 40 }}
-                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "Pending" ? "bg-zinc-600" : ""}`}
-                onPress={() => filterBookings("Pending")}
-              >
-                <Text className="text-zinc-200">Pending</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{ borderRadius: 8, width: 75, height: 40 }}
-                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "Settlement" ? "bg-zinc-600" : ""}`}
-                onPress={() => filterBookings("Settlement")}
-              >
-                <Text className="text-zinc-200">Settlement</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{ borderRadius: 8, width: 75, height: 40 }}
-                className={`items-center justify-center bg-zinc-700 ${selectedStatus === "Completed" ? "bg-zinc-600" : ""}`}
-                onPress={() => filterBookings("Completed")}
-              >
-                <Text className="text-zinc-200">Completed</Text>
-              </TouchableOpacity>
+  return (
+    <SafeAreaView>
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        <View className="min-h-screen min-w-screen flex flex-col p-8">
+
+          <View className="flex-row justify-between items-start">
+            <View>
+              <Text className="text-2xl font-bold">Your</Text>
+              <Text className="text-lg">appointment list</Text>
+            </View>
+            <View className="flex-row items-center gap-x-2">
+              <Entypo name="bookmarks" size={34} color="black" />
             </View>
           </View>
 
-          {/* List Booking */}
-          <View className="space-y-4">
-            {filteredBookings && filteredBookings.length > 0 ? (
-              filteredBookings.map((booking) => (
+          <View className="flex-row mt-8 mb-6 bg-zinc-200 rounded-full p-2 justify-between items-center">
+            <TouchableOpacity
+              className={`rounded-full flex-1 py-2 items-center ${selectedStatus === "All" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
+              onPress={() => filterBookings("All")}>
+              <Text className="text-zinc-900 font-bold">All</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`rounded-full flex-1 py-2 items-center ${selectedStatus === "Pending" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
+              onPress={() => filterBookings("Pending")}>
+              <Text className="text-zinc-900 font-bold">Pending</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`rounded-full flex-1 py-2 items-center ${selectedStatus === "Settlement" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
+              onPress={() => filterBookings("Settlement")}>
+              <Text className="text-zinc-900 font-bold">Settlement</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`rounded-full flex-1 py-2 items-center ${selectedStatus === "Completed" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
+              onPress={() => filterBookings("Completed")}>
+              <Text className="text-zinc-900 font-bold">Completed</Text>
+            </TouchableOpacity>
+          </View>
+
+          {filteredBookings && filteredBookings.length > 0 ? (
+            filteredBookings.map((booking) => (
+              <TouchableOpacity onPress={() => handleViewDetail(booking.booking_id)}>
                 <View
                   key={booking.booking_id}
-                  className="bg-zinc-700 p-4 rounded-lg space-y-2"
-                >
-                  <Text className="text-zinc-200 text-lg font-bold">
-                    {booking.barber.name}
-                  </Text>
-                  <Text className="text-zinc-400 text-sm">
-                    Booking ID: {booking.booking_id}
-                  </Text>
-                  <Text className="text-zinc-400 text-sm">
-                    Date: {moment(booking.bookingDate).format("MMMM Do YYYY, HH:mm")}
-                  </Text>
+                  className="flex flex-col my-4 border-2 border-zinc-200 gap-y-2 rounded-3xl">
+                  <View className="flex-row items-center justify-between px-4">
+                    <Text className="text-zinc-900 text-lg font-bold">{booking.barber.name}</Text>
+                    <Fontisto name="bookmark-alt" size={20} color={"black"} />
+                  </View>
 
-                  <View className="space-y-1">
+                  <View className="rounded-3xl bg-zinc-200 gap-y-1 p-4">
+                    <View className="flex-row items-center justify-center rounded-full bg-zinc-300 py-1 w-1/3">
+                      <MaterialIcons name="access-time" size={13} color={"black"} />
+                      <Text className="ml-1 text-xs">Booking Date</Text>
+                    </View>
+                    <Text className="text-zinc-900 text-sm">{moment(booking.bookingDate).format("MMMM Do YYYY, HH:mm")}</Text>
+
                     {booking.services.map((service) => (
-                      <View
-                        key={service.service_id}
-                        className="flex-row justify-between items-center"
-                      >
-                        <Text className="text-zinc-200 text-sm">
-                          {service.service_name}
-                        </Text>
-                        <Text className="text-zinc-200 text-sm">
-                          Rp{service.price.toLocaleString("id-ID")}
+                      <View key={service.service_id}>
+                        <Text className="text-zinc-900 text-sm font-semibold">
+                          {service.service_name} Rp. {service.price.toLocaleString("id-ID")}
                         </Text>
                       </View>
                     ))}
-                  </View>
 
-                  <Text className="text-zinc-400 text-sm">
-                    Status Booking: {toTitleCase(booking.status)}
-                  </Text>
-
-                  <View className="flex-row justify-between mt-2">
-                    <TouchableOpacity
-                      onPress={() => handleViewDetail(booking.booking_id)}
-                      className="bg-zinc-200 p-2 rounded-lg"
-                    >
-                      <Text className="text-zinc-900 text-center font-semibold">
-                        View Detail
-                      </Text>
-                    </TouchableOpacity>
+                    <Text
+                      className={`${colorStatus(booking.status)} font-bold rounded-full py-1 text-center w-1/2`}>
+                      {toTitleCase(booking.status)}
+                    </Text>
                   </View>
                 </View>
-              ))
-            ) : (
-              <Text className="text-zinc-200 text-center">
-                No bookings available
+              </TouchableOpacity>
+            ))
+          ) : (
+            <View className="flex-col items-center">
+              <Image
+                source={require("../../assets/lazy.png")}
+                style={{ width: 200, height: 200 }}
+              />
+              <Text className="text-zinc-900 text-lg font-bold text-center">
+                No bookings are available
               </Text>
-            )}
-          </View>
-        </ScrollView>
-      </View>
+            </View>
+
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
