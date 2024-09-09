@@ -117,22 +117,22 @@ const HistoryScreen = ({ navigation }) => {
 
           <View className="flex-row mt-8 mb-6 bg-zinc-200 rounded-full p-2 justify-between items-center">
             <TouchableOpacity
-              className={`rounded-full flex-1 py-2 items-center ${selectedStatus === "All" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
+              className={`rounded-full w-12 py-2 items-center ${selectedStatus === "All" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
               onPress={() => filterBookings("All")}>
               <Text className="text-zinc-900 font-bold">All</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`rounded-full flex-1 py-2 items-center ${selectedStatus === "Pending" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
+              className={`rounded-full w-20 py-2 items-center ${selectedStatus === "Pending" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
               onPress={() => filterBookings("Pending")}>
               <Text className="text-zinc-900 font-bold">Pending</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`rounded-full flex-1 py-2 items-center ${selectedStatus === "Settlement" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
+              className={`rounded-full w-24 py-2 items-center ${selectedStatus === "Settlement" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
               onPress={() => filterBookings("Settlement")}>
               <Text className="text-zinc-900 font-bold">Settlement</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`rounded-full flex-1 py-2 items-center ${selectedStatus === "Completed" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
+              className={`rounded-full w-24 py-2 items-center ${selectedStatus === "Completed" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
               onPress={() => filterBookings("Completed")}>
               <Text className="text-zinc-900 font-bold">Completed</Text>
             </TouchableOpacity>

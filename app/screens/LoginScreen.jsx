@@ -114,7 +114,7 @@ export const LoginScreen = ({ navigation }) => {
       }
     } catch (error) {
       Toast.show({
-        type: "error",
+        type: ALERT.ALERT_TYPE.DANGER,
         textBody: error.response.data.message,
         autoClose: 2000,
       });
