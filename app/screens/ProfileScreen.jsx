@@ -14,14 +14,17 @@ import { logout } from "../store/users";
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser);
-  // console.log("user", user);
-  // const profile = useSelector((state) => state.profileData.profileData);
-  // console.log(profile);
+
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("rememberedUser");
-    dispatch(logout());
-    navigation.navigate("Login");
+    try {
+      await AsyncStorage.removeItem("rememberedUser");
+      dispatch(logout());
+      navigation.replace("Login"); 
+    } catch (error) {
+      console.error("Logout error: ", error);
+    }
   };
+
   const handleHistory = () => {
     navigation.navigate("History");
   };
@@ -37,8 +40,15 @@ export default function ProfileScreen({ navigation }) {
               style={{ width: 120, height: 120, borderRadius: 60 }}
             />
             <View className="flex-row items-center gap-x-2">
-              <Text className="font-black text-3xl">{user.email.split("@")[0]}</Text>
-              <Feather name="edit-3" size={22} color="#9ca3af" onPress={() => navigation.navigate("EditProfile")}/>
+              <Text className="font-black text-3xl">
+                {user ? user.email.split("@")[0] : "Guest"}
+              </Text>
+              <Feather
+                name="edit-3"
+                size={22}
+                color="#9ca3af"
+                onPress={() => navigation.navigate("EditProfile")}
+              />
             </View>
           </View>
 
@@ -122,26 +132,49 @@ export default function ProfileScreen({ navigation }) {
               <Text className="text-lg font-semibold">Booking History</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#27272a" onPress={handleHistory} />
+              <Feather
+                name="arrow-right"
+                size={24}
+                color="#27272a"
+                onPress={handleHistory}
+              />
             </View>
           </View>
           <Text className="py-2">More info and support</Text>
           <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
             <View className="flex-row items-center gap-2">
-              <Ionicons name="information-circle-outline" size={26} color="#27272a" />
+              <Ionicons
+                name="information-circle-outline"
+                size={26}
+                color="#27272a"
+              />
               <Text className="text-lg font-semibold">About</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#27272a" onPress={() => navigation.navigate("About")} />
+              <Feather
+                name="arrow-right"
+                size={24}
+                color="#27272a"
+                onPress={() => navigation.navigate("About")}
+              />
             </View>
           </View>
           <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
             <View className="flex-row items-center gap-2">
-              <Ionicons name="help-circle-outline" size={26} color="#27272a" />
+              <Ionicons
+                name="help-circle-outline"
+                size={26}
+                color="#27272a"
+              />
               <Text className="text-lg font-semibold">Help Center</Text>
             </View>
             <View>
-              <Feather name="arrow-right" size={24} color="#27272a" onPress={() => navigation.navigate("HelpCenter")} />
+              <Feather
+                name="arrow-right"
+                size={24}
+                color="#27272a"
+                onPress={() => navigation.navigate("HelpCenter")}
+              />
             </View>
           </View>
           <View className="flex-row items-center justify-between p-2 my-2 rounded-3xl border-2 border-zinc-200">
@@ -154,7 +187,10 @@ export default function ProfileScreen({ navigation }) {
             </View>
           </View>
           <View className="flex-row items-center justify-center p-2 my-2 rounded-3xl border-2 border-red-200">
-            <TouchableOpacity className="flex-row items-center gap-2" onPress={handleLogout}>
+            <TouchableOpacity
+              className="flex-row items-center gap-2"
+              onPress={handleLogout}
+            >
               <Ionicons name="exit-outline" size={26} color="#ef4444" />
               <Text className="text-red-500 text-lg font-semibold">Sign out</Text>
             </TouchableOpacity>

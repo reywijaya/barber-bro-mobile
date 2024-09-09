@@ -10,7 +10,7 @@ import {
 import { CheckBox } from "react-native-elements";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../service/axios";
 import { useTogglePasswordVisibility } from "../hooks/useTogglePasswordVisibility";
 import { login } from "../store/users";
@@ -26,18 +26,20 @@ export const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { isPasswordVisible, togglePasswordVisibility, rightIcon } =
     useTogglePasswordVisibility();
+  // const userData=useSelector((state) => state.user.loggedInUser);
+  // console.log(userData)
 
   const handleLogin = async () => {
-    if (email === "" || password === "") {
+    if (!email || !password) {
       Toast.show({
         title: "Error",
         type: ALERT_TYPE.DANGER,
         textBody: "Email and password are required",
         autoClose: 2000,
-      })
+      });
       return;
     }
-
+  
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (!emailRegex.test(email)) {
       Toast.show({
@@ -45,35 +47,33 @@ export const LoginScreen = ({ navigation }) => {
         type: ALERT_TYPE.DANGER,
         textBody: "Please enter a valid email address",
         autoClose: 2000,
-      })
+      });
       return;
     }
-
+  
     if (password.length < 8) {
       Toast.show({
         title: "Error",
         type: ALERT_TYPE.DANGER,
         textBody: "Password must be at least 8 characters long",
         autoClose: 2000,
-      })
+      });
       return;
     }
-
+  
     try {
       const response = await axiosInstance.post(`/login`, { email, password });
+  
       if (response.status === 200) {
-        const token = response.data.data.token;
+        const { token, ...userData } = response.data.data;
+        // console.log("userData:", userData);
         await AsyncStorage.setItem("token", token);
-
+        await AsyncStorage.setItem("rememberMe", rememberMe.toString());
+        // getDataProfile(token, dispatch);
         if (rememberMe) {
-          await AsyncStorage.setItem(
-            "rememberedUser",
-            JSON.stringify(response.data.data)
-          );
-        } else {
-          await AsyncStorage.removeItem("rememberedUser");
+          await AsyncStorage.setItem("rememberedUser", JSON.stringify(userData));
         }
-
+  
         dispatch(login(response.data.data));
         Toast.show({
           type: ALERT_TYPE.SUCCESS,
@@ -88,17 +88,19 @@ export const LoginScreen = ({ navigation }) => {
           type: ALERT_TYPE.DANGER,
           textBody: "Login failed, please check your email or password",
           autoClose: 2000,
-        })
+        });
       }
     } catch (error) {
-      console.log("error:", error.response?.data || error.message);
+      const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
+      console.log("error:", errorMessage);
       Toast.show({
-        type: ALERT.ALERT_TYPE.DANGER,
-        textBody: error.response.data.message,
+        type: ALERT_TYPE.DANGER,
+        textBody: errorMessage,
         autoClose: 2000,
-      })
+      });
     }
   };
+  
 
   return (
     <SafeAreaView>

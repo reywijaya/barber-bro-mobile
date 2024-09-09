@@ -59,6 +59,7 @@ const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser);
+  // console.log(user);
   const [dataNearbyBarbershop, setDataNearbyBarbershop] = useState([]);
   const [sortDistance, setSortDistance] = useState("");
   const [sortRating, setSortRating] = useState("");
@@ -78,17 +79,14 @@ const HomeScreen = ({ navigation }) => {
   const loadUserData = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const storedUserData = await AsyncStorage.getItem("rememberedUser");
-      if (!token || !storedUserData) {
+      if (!token || !user) {
         navigation.navigate("Login");
         return;
       }
-      const userData = JSON.parse(storedUserData);
-      dispatch(login(userData));
       Toast.show({
         title: "Success",
         type: ALERT_TYPE.SUCCESS,
-        textBody: `Welcome back, ${userData.email}!`,
+        textBody: `Welcome back, ${user.email}!`,
         autoClose: 2000,
       });
     } catch (error) {

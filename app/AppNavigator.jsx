@@ -5,10 +5,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TabNavigator from "./TabNavigator";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import ProfileScreen from "./screens/ProfileScreen";
 import BarbershopProfileScreen from "./screens/BarbershopProfileScreen";
-import { PaymentScreen, ReviewScreen } from "./screens/ReviewScreen";
+import { ReviewScreen } from "./screens/ReviewScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import MapsComponent from "./component/MapsComponent";
 import { login } from "./store/users";
@@ -28,16 +28,26 @@ const AppNavigator = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const dispatch = useDispatch();
+  const storeUser = useSelector((state) => state.user.loggedInUser);
+
   const checkLoggedInUser = async () => {
     try {
-      const loggedInUser = await AsyncStorage.getItem("rememberedUser");
-      setUser(JSON.parse(loggedInUser));
-      dispatch(login(JSON.parse(loggedInUser)));
+      const rememberMe = await AsyncStorage.getItem("rememberMe");
+      if (rememberMe === "true") {
+        const loggedInUser = await AsyncStorage.getItem("rememberedUser");
+        const parsedUser = JSON.parse(loggedInUser);
+        setUser(parsedUser);
+        if (parsedUser) {
+          dispatch(login(parsedUser));
+        }
+      } else {
+        setUser(storeUser);
+        if (storeUser) {
+          dispatch(login(storeUser));
+        }
+      }
     } catch (error) {
-      console.error(
-        "Failed to load user data from AsyncStorage:",
-        error.message
-      );
+      console.error("Failed to load user data from AsyncStorage:", error.message);
     } finally {
       setLoading(false);
     }
@@ -45,7 +55,7 @@ const AppNavigator = () => {
 
   useEffect(() => {
     checkLoggedInUser();
-  }, []);
+  }, [storeUser]); 
 
   if (loading) {
     return (
@@ -74,7 +84,6 @@ const AppNavigator = () => {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Barbershop" component={BarbershopProfileScreen} />
-      {/* <Stack.Screen name="Payment" component={PaymentScreen} /> */}
       <Stack.Screen name="Appointment" component={AppointmentScreen} />
       <Stack.Screen name="Review" component={ReviewScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
