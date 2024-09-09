@@ -58,7 +58,7 @@ const NotificationScreen = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className="flex-1 bg-black mt-6">
       <View className="bg-zinc-800 p-4 flex-row items-center">
         <Ionicons
           name="arrow-back-outline"
