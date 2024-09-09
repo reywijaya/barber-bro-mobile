@@ -39,7 +39,7 @@ export const LoginScreen = ({ navigation }) => {
       });
       return;
     }
-  
+
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (!emailRegex.test(email)) {
       Toast.show({
@@ -50,7 +50,7 @@ export const LoginScreen = ({ navigation }) => {
       });
       return;
     }
-  
+
     if (password.length < 8) {
       Toast.show({
         title: "Error",
@@ -60,10 +60,10 @@ export const LoginScreen = ({ navigation }) => {
       });
       return;
     }
-  
+
     try {
       const response = await axiosInstance.post(`/login`, { email, password });
-  
+
       if (response.status === 200) {
         const { token, ...userData } = response.data.data;
         // console.log("userData:", userData);
@@ -71,9 +71,12 @@ export const LoginScreen = ({ navigation }) => {
         await AsyncStorage.setItem("rememberMe", rememberMe.toString());
         // getDataProfile(token, dispatch);
         if (rememberMe) {
-          await AsyncStorage.setItem("rememberedUser", JSON.stringify(userData));
+          await AsyncStorage.setItem(
+            "rememberedUser",
+            JSON.stringify(userData)
+          );
         }
-  
+
         dispatch(login(response.data.data));
         Toast.show({
           type: ALERT_TYPE.SUCCESS,
@@ -91,7 +94,8 @@ export const LoginScreen = ({ navigation }) => {
         });
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
+      const errorMessage =
+        error.response?.data?.message || "An error occurred. Please try again.";
       console.log("error:", errorMessage);
       Toast.show({
         type: ALERT_TYPE.DANGER,
@@ -100,7 +104,6 @@ export const LoginScreen = ({ navigation }) => {
       });
     }
   };
-  
 
   return (
     <SafeAreaView>
@@ -111,8 +114,8 @@ export const LoginScreen = ({ navigation }) => {
             <Text className="text-xl">Sign in</Text>
           </View>
           <View className="my-10">
-            <Text className="text-3xl font-bold">Welcome to Barber Bro,
-              find the perfect barbershop near you.
+            <Text className="text-3xl font-bold">
+              Welcome to Barber Bro, find the perfect barbershop near you.
             </Text>
             <Text className="my-2">
               New to Barber Bro?{" "}

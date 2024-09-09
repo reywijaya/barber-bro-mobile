@@ -104,12 +104,13 @@ export default function AppointmentScreen({ route, navigation }) {
   const [date, setDate] = useState(new Date());
   const [formattedDate, setFormattedDate] = useState(date.toLocaleDateString());
   const convertDate = convertDateToMillis(formattedDate);
+  console.log("convertDate", convertDate);
   const [selectedTime, setSelectedTime] = useState(null);
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user.loggedInUser);
   console.log("userData.token", userData.token);
   const [availableTimes, setAvailableTimes] = useState(null);
-  console.log(availableTimes);
+  console.log("availableTimes", availableTimes);
   const fetchAvailableTimes = async () => {
     try {
       const response = await axiosInstance.get(

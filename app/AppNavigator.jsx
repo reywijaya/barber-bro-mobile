@@ -12,10 +12,10 @@ import { ReviewScreen } from "./screens/ReviewScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import MapsComponent from "./component/MapsComponent";
 import { login } from "./store/users";
-import HelpScreen from "./screens/HelpScreen";
-import AboutScreen from "./screens/AboutScreen";
-import PrivateScreen from "./screens/PrivateScreen";
-import NotificationScreen from "./screens/NotificationScreen";
+// import HelpScreen from "./screens/HelpScreen";
+// import AboutScreen from "./screens/AboutScreen";
+// import PrivateScreen from "./screens/PrivateScreen";
+// import NotificationScreen from "./screens/NotificationScreen";
 import AppointmentScreen from "./screens/AppointmentScreen";
 import DetailsBookingScreen from "./screens/DetailsBookingScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
@@ -47,7 +47,10 @@ const AppNavigator = () => {
         // }
       }
     } catch (error) {
-      console.error("Failed to load user data from AsyncStorage:", error.message);
+      console.error(
+        "Failed to load user data from AsyncStorage:",
+        error.message
+      );
     } finally {
       setLoading(false);
     }
@@ -55,7 +58,7 @@ const AppNavigator = () => {
 
   useEffect(() => {
     checkLoggedInUser();
-  }, [storeUser]); 
+  }, [storeUser]);
 
   if (loading) {
     return (
@@ -88,11 +91,11 @@ const AppNavigator = () => {
       <Stack.Screen name="Review" component={ReviewScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="Maps" component={MapsComponent} />
-      <Stack.Screen name="HelpCenter" component={HelpScreen} />
-      <Stack.Screen name="About" component={AboutScreen} />
+      {/* <Stack.Screen name="HelpCenter" component={HelpScreen} /> */}
+      {/* <Stack.Screen name="About" component={AboutScreen} /> */}
       <Stack.Screen name="DetailsBooking" component={DetailsBookingScreen} />
-      <Stack.Screen name="PrivacyPolicy" component={PrivateScreen} />
-      <Stack.Screen name="Notification" component={NotificationScreen} />
+      {/* <Stack.Screen name="PrivacyPolicy" component={PrivateScreen} /> */}
+      {/* <Stack.Screen name="Notification" component={NotificationScreen} /> */}
       <Stack.Screen name="Tab" component={TabNavigator} />
     </Stack.Navigator>
   );
