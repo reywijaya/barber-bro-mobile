@@ -24,6 +24,7 @@ import {
   setListBookingUser,
 } from "../store/listBookingUser";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const toTitleCase = (str) =>
   str
@@ -44,7 +45,7 @@ export const ReviewScreen = ({ navigation }) => {
   const user = useSelector((state) => state.user.loggedInUser);
   console.log("user", user);
   const dataBooking = useSelector((state) => state.appointment.appointments);
-  const dispatch = useDispatch();
+
 
   const [modalVisible, setModalVisible] = useState(false);
   // console.log(dataBooking.booking_date, dataBooking.booking_time);
@@ -75,14 +76,12 @@ export const ReviewScreen = ({ navigation }) => {
       handlePayment(response.data.data);
 
       // Show success alert
-      Alert.alert("Booking Successful", "Your booking has been confirmed.", [
-        { text: "OK", onPress: () => navigation.navigate("History") },
-      ]);
-
+      Alert.alert("Booking Successful", "Your booking has been confirmed.");
       console.log("Booking successful");
+      navigation.navigate("History");
     } catch (error) {
       console.error(error.response.data);
-      const casting=JSON.stringify(error.response.data.error);
+      const casting = JSON.stringify(error.response.data.error);
 
       // Show error alert
       Alert.alert("Booking Failed", casting);
@@ -91,8 +90,6 @@ export const ReviewScreen = ({ navigation }) => {
 
   const handlePayment = (data) => {
     Linking.openURL(data.midtrans_payment_url);
-
-    dispatch(setListBookingById(data));
 
     console.log("Payment successful");
   };

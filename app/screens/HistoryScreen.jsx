@@ -51,11 +51,6 @@ const HistoryScreen = ({ navigation }) => {
 
   useEffect(() => {
     fetchDataBooking();
-    const intervalId = setInterval(() => {
-      fetchDataBooking();
-    }, 300000); 
-
-    return () => clearInterval(intervalId); 
   }, []);
 
   const handleViewDetail = (bookingId) => {
@@ -66,12 +61,12 @@ const HistoryScreen = ({ navigation }) => {
     setSelectedStatus(status);
   };
   // console.log(selectedStatus)
-  console.log(listBooking)
+  // console.log(listBooking)
   const filteredBookings = useMemo(() => {
     return listBooking.filter((booking) => booking.status === selectedStatus);
   }, [selectedStatus, listBooking]);
 
-  console.log(filteredBookings)
+  // console.log(filteredBookings)
   const colorStatus = (status) => {
     switch (status) {
       case "Pending":

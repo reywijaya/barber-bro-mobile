@@ -14,7 +14,7 @@ import { logout } from "../store/users";
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser);
-  console.log("user", user);
+  // console.log("user", user);
   // const profile = useSelector((state) => state.profileData.profileData);
   // console.log(profile);
   const handleLogout = async () => {

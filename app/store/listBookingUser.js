@@ -9,8 +9,6 @@ const listBookingUser = createSlice({
     reducers: {
         setListBookingUser: (state, action) => {
             state.listBookingUser = action.payload;
-
-            AsyncStorage.setItem('listBookingUser', JSON.stringify(state.listBookingUser));
         },
         setListBookingById: (state, action) => {
             const { id, data } = action.payload;

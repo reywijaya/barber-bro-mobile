@@ -58,25 +58,25 @@ const NotificationScreen = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-black mt-6">
-      <View className="bg-zinc-800 p-4 flex-row items-center">
+    <SafeAreaView className="flex-1 bg-zinc-100">
+      <View className="bg-zinc-100 p-4 flex-row items-center border-solid border border-zinc-900">
         <Ionicons
           name="arrow-back-outline"
           size={24}
-          color="white"
+          color="black"
           onPress={() => navigation.goBack()}
         />
-        <Text className="text-zinc-200 font-bold text-lg ml-2">
+        <Text className="text-zinc-900 font-bold text-lg ml-2">
           Notifications
         </Text>
         <FontAwesome5
           name="bell"
           size={24}
-          color="#e4e4e7"
+          color="black"
           style={{ marginLeft: "auto" }}
         />
       </View>
-      <ScrollView className="flex-1">
+      <ScrollView className="flex-1 bg-zinc-100" showsVerticalScrollIndicator={false}>
         {notifications.length === 0 ? (
           <View className="flex-1 justify-center items-center">
             <Text className="text-zinc-300 text-lg">No notifications</Text>
@@ -85,7 +85,7 @@ const NotificationScreen = ({ navigation }) => {
           notifications.map((notification, index) => (
             <View
               key={index}
-              className="bg-zinc-700 p-4 rounded-md m-2 flex-row items-start"
+              className="bg-zinc-800 p-4 rounded-md m-2 flex-row items-start shadow-lg shadow-zinc-900/50"
             >
               <Image
                 source={{
@@ -95,22 +95,22 @@ const NotificationScreen = ({ navigation }) => {
                 resizeMode="cover"
               />
               <View className="ml-4 flex-1">
-                <Text className="text-zinc-200 text-lg font-bold">
+                <Text className="text-zinc-300 text-lg font-bold">
                   {notification.barber.name}
                 </Text>
-                <Text className="text-zinc-300 text-sm mt-1">
+                <Text className="text-zinc-400 text-sm mt-1">
                   {notification.barber.street_address}, {notification.barber.city}
                 </Text>
-                <Text className="text-zinc-300 text-sm mt-1">
+                <Text className="text-zinc-400 text-sm mt-1">
                   {notification.customer.firstName} {notification.customer.surname}
                 </Text>
-                <Text className="text-zinc-300 text-xs mt-1">
-                  {new Date(notification.booking_date).toLocaleDateString()} at {notification.booking_time}
+                <Text className="text-zinc-400 text-xs mt-1">
+                  {new Date(notification.booking_date).toLocaleDateString()} 
                 </Text>
-                <Text className="text-zinc-300 text-xs mt-1">
+                <Text className="text-zinc-400 text-xs mt-1">
                   Status: {toTitleCase(notification.status)} 
                 </Text>
-                <Text className="text-zinc-300 text-xs mt-1">
+                <Text className="text-zinc-400 text-xs mt-1">
                   Total Price: {formatPrice(notification.total_price)}
                 </Text>
               </View>
@@ -121,10 +121,7 @@ const NotificationScreen = ({ navigation }) => {
                   color="#e4e4e7"
                 />
                 <Text className="text-zinc-300 text-xs ml-1">
-                  {new Intl.DateTimeFormat("id-ID", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(new Date(notification.booking_date))}
+                {notification.booking_time}
                 </Text>
               </View>
             </View>
