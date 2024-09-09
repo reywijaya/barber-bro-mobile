@@ -240,7 +240,7 @@ const HomeScreen = ({ navigation }) => {
                     style={{ width: 100, height: 100, borderRadius: 16 }}
                   />
                   <View className="flex-col gap-y-1 px-3">
-                    <Text className="text-xl font-bold">
+                    <Text className="text-lg font-bold">
                       {toTitleCase(item.name)}
                     </Text>
                     <Text className="text-zinc-500">
