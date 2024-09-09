@@ -37,7 +37,7 @@ export default function ProfileScreen({ navigation }) {
               />
               <View className="flex-row items-center gap-x-2">
                 <Text className="font-black text-3xl">{user.email.split("@")[0]}</Text>
-                <Feather name="edit-3" size={22} color="#9ca3af" />
+                <Feather name="edit-3" size={22} color="#9ca3af" onPress={() => navigation.navigate("EditProfile")}/>
               </View>
               <View className="flex-row items-center gap-x-2 bg-violet-200 rounded-full p-2 w-full justify-between">
                 <Text className="text-violet-700 font-extrabold">BarberBro Loyalty</Text>

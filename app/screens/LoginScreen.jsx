@@ -93,9 +93,8 @@ export const LoginScreen = ({ navigation }) => {
     } catch (error) {
       console.log("error:", error.response?.data || error.message);
       Toast.show({
-        title: "Error",
-        type: ALERT_TYPE.DANGER,
-        textBody: "Login failed, please check your email or password",
+        type: ALERT.ALERT_TYPE.DANGER,
+        textBody: error.response.data.message,
         autoClose: 2000,
       })
     }
