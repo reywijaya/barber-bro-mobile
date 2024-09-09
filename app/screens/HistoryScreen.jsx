@@ -6,7 +6,7 @@ import axiosInstance from "../service/axios";
 import { setListBookingUser } from "../store/listBookingUser";
 import moment from "moment";
 import { TouchableOpacity } from "react-native";
-import { Entypo, Fontisto, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Entypo, Fontisto, MaterialIcons } from "@expo/vector-icons";
 
 const toTitleCase = (str) => {
   return str.replace(
@@ -20,16 +20,15 @@ const HistoryScreen = ({ navigation }) => {
   const listBooking = useSelector(
     (state) => state.listBookingUser.listBookingUser
   );
-  console.log(listBooking);
+  // console.log(listBooking);
   const dispatch = useDispatch();
 
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("All");
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("Pending");
 
   // Fetch data bookings from API
   const fetchDataBooking = async () => {
-    setIsLoading(true);
+    setRefreshing(true);
     try {
       const response = await axiosInstance.get("/bookings/current", {
         headers: {
@@ -40,7 +39,7 @@ const HistoryScreen = ({ navigation }) => {
     } catch (error) {
       console.log("Failed to fetch bookings:", error);
     } finally {
-      setIsLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -52,12 +51,11 @@ const HistoryScreen = ({ navigation }) => {
 
   useEffect(() => {
     fetchDataBooking();
-    // Optional: Set interval to auto-refresh and update status every 5 minutes
     const intervalId = setInterval(() => {
       fetchDataBooking();
-    }, 300000); // 300,000 ms = 5 minutes
+    }, 300000); 
 
-    return () => clearInterval(intervalId); // Clear the interval on component unmount
+    return () => clearInterval(intervalId); 
   }, []);
 
   const handleViewDetail = (bookingId) => {
@@ -67,18 +65,13 @@ const HistoryScreen = ({ navigation }) => {
   const filterBookings = (status) => {
     setSelectedStatus(status);
   };
+  // console.log(selectedStatus)
+  console.log(listBooking)
+  const filteredBookings = useMemo(() => {
+    return listBooking.filter((booking) => booking.status === selectedStatus);
+  }, [selectedStatus, listBooking]);
 
-  // Memoize the filtered bookings to avoid unnecessary recalculations
-  const filteredBookings = useMemo(
-    () =>
-      selectedStatus === "All"
-        ? listBooking
-        : listBooking.filter(
-            (booking) => toTitleCase(booking.status) === selectedStatus
-          ),
-    [listBooking, selectedStatus]
-  );
-
+  console.log(filteredBookings)
   const colorStatus = (status) => {
     switch (status) {
       case "Pending":
@@ -94,9 +87,12 @@ const HistoryScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView>
-      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View className="min-h-screen min-w-screen flex flex-col p-8">
-
           <View className="flex-row justify-between items-start">
             <View>
               <Text className="text-2xl font-bold">Your</Text>
@@ -109,55 +105,82 @@ const HistoryScreen = ({ navigation }) => {
 
           <View className="flex-row mt-8 mb-6 bg-zinc-200 rounded-full p-2 justify-between items-center">
             <TouchableOpacity
-              className={`rounded-full w-12 py-2 items-center ${selectedStatus === "All" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
-              onPress={() => filterBookings("All")}>
-              <Text className="text-zinc-900 font-bold">All</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className={`rounded-full w-20 py-2 items-center ${selectedStatus === "Pending" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
-              onPress={() => filterBookings("Pending")}>
+              className={`rounded-full flex-1 py-2 items-center ${
+                selectedStatus === "Pending"
+                  ? "bg-zinc-300 border-2 border-zinc-300"
+                  : ""
+              }`}
+              onPress={() => filterBookings("Pending")}
+            >
               <Text className="text-zinc-900 font-bold">Pending</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`rounded-full w-24 py-2 items-center ${selectedStatus === "Settlement" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
-              onPress={() => filterBookings("Settlement")}>
+              className={`rounded-full flex-1 py-2 items-center ${
+                selectedStatus === "Settlement"
+                  ? "bg-zinc-300 border-2 border-zinc-300"
+                  : ""
+              }`}
+              onPress={() => filterBookings("Settlement")}
+            >
               <Text className="text-zinc-900 font-bold">Settlement</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`rounded-full w-24 py-2 items-center ${selectedStatus === "Completed" ? "bg-zinc-300 border-2 border-zinc-300" : ""}`}
-              onPress={() => filterBookings("Completed")}>
+              className={`rounded-full flex-1 py-2 items-center ${
+                selectedStatus === "Completed"
+                  ? "bg-zinc-300 border-2 border-zinc-300"
+                  : ""
+              }`}
+              onPress={() => filterBookings("Completed")}
+            >
               <Text className="text-zinc-900 font-bold">Completed</Text>
             </TouchableOpacity>
           </View>
 
           {filteredBookings && filteredBookings.length > 0 ? (
             filteredBookings.map((booking) => (
-              <TouchableOpacity onPress={() => handleViewDetail(booking.booking_id)}>
+              <TouchableOpacity
+                onPress={() => handleViewDetail(booking.booking_id)}
+              >
                 <View
                   key={booking.booking_id}
-                  className="flex flex-col my-4 border-2 border-zinc-200 gap-y-2 rounded-3xl">
+                  className="flex flex-col my-4 border-2 border-zinc-200 gap-y-2 rounded-3xl"
+                >
                   <View className="flex-row items-center justify-between px-4">
-                    <Text className="text-zinc-900 text-lg font-bold">{booking.barber.name}</Text>
+                    <Text className="text-zinc-900 text-lg font-bold">
+                      {booking.barber.name}
+                    </Text>
                     <Fontisto name="bookmark-alt" size={20} color={"black"} />
                   </View>
 
                   <View className="rounded-3xl bg-zinc-200 gap-y-1 p-4">
                     <View className="flex-row items-center justify-center rounded-full bg-zinc-300 py-1 w-1/3">
-                      <MaterialIcons name="access-time" size={13} color={"black"} />
+                      <MaterialIcons
+                        name="access-time"
+                        size={13}
+                        color={"black"}
+                      />
                       <Text className="ml-1 text-xs">Booking Date</Text>
                     </View>
-                    <Text className="text-zinc-900 text-sm">{moment(booking.bookingDate).format("MMMM Do YYYY, HH:mm")}</Text>
+                    <Text className="text-zinc-900 text-sm">
+                      {moment(booking.bookingDate).format(
+                        "MMMM Do YYYY, HH:mm"
+                      )}
+                    </Text>
 
                     {booking.services.map((service) => (
                       <View key={service.service_id}>
                         <Text className="text-zinc-900 text-sm font-semibold">
-                          {service.service_name} Rp. {service.price.toLocaleString("id-ID")}
+                          {service.service_name} Rp.{" "}
+                          {service.price.toLocaleString("id-ID")}
                         </Text>
                       </View>
                     ))}
 
                     <Text
-                      className={`${colorStatus(booking.status)} font-bold rounded-full py-1 text-center w-1/2`}>
+                      className={`${colorStatus(
+                        toTitleCase(booking.status)
+                      )} font-bold rounded-full py-1 text-center w-1/2`}
+                    >
                       {toTitleCase(booking.status)}
                     </Text>
                   </View>
@@ -174,7 +197,6 @@ const HistoryScreen = ({ navigation }) => {
                 No bookings are available
               </Text>
             </View>
-
           )}
         </View>
       </ScrollView>

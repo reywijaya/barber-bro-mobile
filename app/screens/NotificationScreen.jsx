@@ -14,6 +14,12 @@ const formatPrice = (price) => {
     minimumFractionDigits: 2,
   }).format(price);
 };
+const toTitleCase = (str) => {
+  return str.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+  );
+};
 
 const NotificationScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -102,7 +108,7 @@ const NotificationScreen = ({ navigation }) => {
                   {new Date(notification.booking_date).toLocaleDateString()} at {notification.booking_time}
                 </Text>
                 <Text className="text-zinc-300 text-xs mt-1">
-                  Status: {notification.status}
+                  Status: {toTitleCase(notification.status)} 
                 </Text>
                 <Text className="text-zinc-300 text-xs mt-1">
                   Total Price: {formatPrice(notification.total_price)}

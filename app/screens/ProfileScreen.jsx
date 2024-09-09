@@ -9,11 +9,13 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import React from "react";
+import { logout } from "../store/users";
 
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser);
-  const profile = useSelector((state) => state.profileData.profileData);
+  console.log("user", user);
+  // const profile = useSelector((state) => state.profileData.profileData);
   // console.log(profile);
   const handleLogout = async () => {
     await AsyncStorage.removeItem("rememberedUser");

@@ -12,12 +12,10 @@ const barbershopSlice = createSlice({
   reducers: {
     getBarbershops: (state, action) => {
       state.barbershops = action.payload;
-      // Simpan data barbershops ke AsyncStorage
       AsyncStorage.setItem('barbershops', JSON.stringify(state.barbershops));
     },
     getBarbershopById: (state, action) => {
       state.barbershopById = action.payload;
-      // Simpan data barbershopById ke AsyncStorage
       AsyncStorage.setItem('barbershopById', JSON.stringify(state.barbershopById));
     },
     loadBarbershopsFromStorage: (state, action) => {
