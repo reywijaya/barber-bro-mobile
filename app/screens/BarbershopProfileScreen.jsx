@@ -280,7 +280,7 @@ export default function BarbershopProfileScreen({ route, navigation }) {
                       imageSize={20}
                       readonly
                       startingValue={item.rating}
-                      tintColor="#f9f9f9"
+                      
                     />
                   </View>
                   <Text className="text-zinc-800 mt-2">{item.comment}</Text>

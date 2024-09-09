@@ -37,14 +37,14 @@ const AppNavigator = () => {
         const loggedInUser = await AsyncStorage.getItem("rememberedUser");
         const parsedUser = JSON.parse(loggedInUser);
         setUser(parsedUser);
-        if (parsedUser) {
-          dispatch(login(parsedUser));
-        }
+        // if (parsedUser) {
+        //   dispatch(login(parsedUser));
+        // }
       } else {
         setUser(storeUser);
-        if (storeUser) {
-          dispatch(login(storeUser));
-        }
+        // if (storeUser) {
+        //   dispatch(login(storeUser));
+        // }
       }
     } catch (error) {
       console.error("Failed to load user data from AsyncStorage:", error.message);

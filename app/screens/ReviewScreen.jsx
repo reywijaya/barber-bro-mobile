@@ -25,6 +25,7 @@ import {
 } from "../store/listBookingUser";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import moment from "moment";
 
 const toTitleCase = (str) =>
   str
@@ -52,13 +53,14 @@ export const ReviewScreen = ({ navigation }) => {
   const [day, month, year] = dataBooking.booking_date.split("/").map(Number);
   // console.log(day, month, year);
   const formattedDate = new Date(year, month - 1, day);
+  const formattedTime = moment(dataBooking.booking_time, 'HH:mm').format('HH:mm');
 
   const idServices = dataBooking.services.map((service) => service.id);
   const bookingValues = {
     barber_id: dataBooking.barbershop.id,
     services: idServices,
     booking_date: formattedDate.getTime(),
-    booking_time: dataBooking.booking_time,
+    booking_time: formattedTime,
   };
   console.log("bookingValues", bookingValues);
 
@@ -135,7 +137,7 @@ export const ReviewScreen = ({ navigation }) => {
               <View className="flex-row justify-between mb-3">
                 <Text className="text-zinc-400">Date</Text>
                 <Text className="text-zinc-400 text-xs">
-                  {dataBooking.booking_date} at {dataBooking.booking_time}
+                  {dataBooking.booking_date} at {formattedTime}
                 </Text>
               </View>
 

@@ -2,27 +2,20 @@ import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
-  ImageBackground,
   Image,
   ScrollView,
   RefreshControl,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAppointments } from "../store/appointment";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Fontisto, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
-
-const toTitleCase = (str) => {
-  return str.replace(
-    /\w\S*/g,
-    (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
-  );
-};
+import { Picker } from "@react-native-picker/picker";
+import axiosInstance from "../service/axios";
 
 const formatPrice = (price) => {
   return new Intl.NumberFormat("id-ID", {
@@ -30,6 +23,13 @@ const formatPrice = (price) => {
     currency: "IDR",
     minimumFractionDigits: 2,
   }).format(price);
+};
+const toTitleCase = (str) => {
+  if (typeof str !== "string") return str;
+  return str.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+  );
 };
 
 const validateTime = (selectedTimeString, operationalHours) => {
@@ -43,7 +43,8 @@ const validateTime = (selectedTimeString, operationalHours) => {
     .map(Number);
 
   for (let hour of operationalHours) {
-    const { day, opening_time, closing_time } = hour;
+    const { day, opening_time, closing_time, limit_per_session } = hour;
+
     if (!opening_time || !closing_time) {
       console.warn(`Opening time or closing time missing for day: ${day}`);
       continue;
@@ -84,37 +85,57 @@ const isWithinRange = (
   return selectedTime >= openingTime && selectedTime <= closingTime;
 };
 
+function convertDateToMillis(dateString) {
+  const dateParts = dateString.split("/");
+  const day = parseInt(dateParts[0], 10);
+  const month = parseInt(dateParts[1], 10) - 1;
+  const year = parseInt(dateParts[2], 10);
+  const date = new Date(year, month, day);
+  const millis = date.getTime();
+  return millis;
+}
+
 export default function AppointmentScreen({ route, navigation }) {
-  const { barbershop } = route.params || {};
+  const { barbershop } = route.params;
+  console.log(barbershop.id);
   const [selectedServiceId, setSelectedServiceId] = useState(null);
   const [totalPayment, setTotalPayment] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
-  const [userData, setUserData] = useState(null);
   const [date, setDate] = useState(new Date());
   const [formattedDate, setFormattedDate] = useState(date.toLocaleDateString());
-  const [selectedTime, setSelectedTime] = useState("09:00");
+  const convertDate = convertDateToMillis(formattedDate);
+  const [selectedTime, setSelectedTime] = useState(null);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        const data = await AsyncStorage.getItem("loggedInUser");
-        if (data) {
-          setUserData(JSON.parse(data));
+  const userData = useSelector((state) => state.user.loggedInUser);
+  console.log("userData.token", userData.token);
+  const [availableTimes, setAvailableTimes] = useState(null);
+  console.log(availableTimes);
+  const fetchAvailableTimes = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `/bookings/${barbershop.id}/${convertDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userData.token}`,
+          },
         }
-      } catch (error) {
-        console.error("Failed to load user data from AsyncStorage:", error);
-      }
-    };
-    loadUserData();
-  }, []);
+      );
+      setAvailableTimes(response.data.data);
+    } catch (error) {
+      console.log(
+        "Failed to fetch available times:",
+        error.response.data.message
+      );
+    }
+  };
 
   useEffect(() => {
     if (barbershop) {
       setTotalPayment(0);
       setSelectedServiceId(null);
     }
-  }, [barbershop]);
+    fetchAvailableTimes();
+  }, [barbershop.id, convertDate, userData.token]);
 
   const radioButtons = useMemo(() => {
     if (!barbershop || !Array.isArray(barbershop.services)) {
@@ -177,49 +198,24 @@ export default function AppointmentScreen({ route, navigation }) {
     }
   };
 
-  const showTimepicker = async () => {
-    try {
-      const { action, hour, minute } = await new Promise((resolve) => {
-        DateTimePickerAndroid.open({
-          value: new Date(
-            0,
-            0,
-            0,
-            parseInt(selectedTime.split(":")[0]),
-            parseInt(selectedTime.split(":")[1])
-          ),
-          mode: "time",
-          is24Hour: true,
-          onChange: (event, selectedDate) => {
-            if (event.type === "dismissed") resolve({ action: "dismissed" });
-            const time = selectedDate || new Date();
-            resolve({
-              action: "set",
-              hour: time.getHours(),
-              minute: time.getMinutes(),
-            });
-          },
-        });
+  const handleTimeChange = (itemValue) => {
+    if (
+      availableTimes?.available_time.includes(itemValue) &&
+      validateTime(itemValue, barbershop.operational_hours)
+    ) {
+      setSelectedTime(itemValue);
+    } else {
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: `Time ${itemValue} is not available or not within operational hours.`,
+        autoClose: 2000,
       });
-
-      if (action === "set") {
-        const formattedTime = `${hour.toString().padStart(2, "0")}:${minute
-          .toString()
-          .padStart(2, "0")}`;
-        if (validateTime(formattedTime, barbershop.operational_hours)) {
-          setSelectedTime(formattedTime);
-        } else {
-          Toast.show({
-            title: "Error",
-            type: ALERT_TYPE.DANGER,
-            textBody: `Time ${formattedTime} is not within operational hours barbershop.`,
-            autoClose: 2000,
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error selecting time:", error);
     }
+  };
+
+  const generateTimeOptions = () => {
+    return availableTimes?.available_time || [];
   };
 
   const saveBookingData = async () => {
@@ -289,145 +285,127 @@ export default function AppointmentScreen({ route, navigation }) {
       Toast.show({
         title: "Error",
         type: ALERT_TYPE.DANGER,
-        textBody: "Failed to save booking data. Please try again.",
+        textBody: "Failed to save booking data.",
         autoClose: 2000,
       });
     }
   };
 
-  if (!barbershop || !barbershop.services || !barbershop.operational_hours) {
-    return (
-      <SafeAreaView>
-        <View className="h-screen items-center bg-zinc-200 justify-center">
-          <Text className="text-zinc-800 font-bold text-base">
-            No Barbershop Data Available
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView className="flex-1 bg-zinc-200">
+    <SafeAreaView className="flex flex-col p-8 min-h-screen">
       {/* Header */}
-      <View className="flex-row p-2 items-center border-solid border-b-2 border-t-2 bg-white">
+      <View className="flex-row items-center justify-between">
         <Ionicons
           name="arrow-back"
-          size={20}
+          size={24}
           color="#030712"
           onPress={() => navigation.goBack()}
         />
-        <Text className="text-xl text-zinc-800 font-bold ml-2">Back</Text>
+        <Text className="text-lg font-bold w-2/3">Appointment</Text>
       </View>
 
       {/* Main Content */}
-      <View className="flex-1">
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
-          {/* Barbershop Info */}
-          <View className="flex-row items-center p-4 bg-black ">
-            <Image
-              source={{
-                uri:
-                  "http://10.10.102.48:8085" +
-                  barbershop.barbershop_profile_picture_id?.path,
-              }}
-              className="w-24 h-24 rounded-lg border-4 border-white"
-            />
-            <View className="ml-4 flex-1">
-              <Text className="text-white text-lg font-bold mb-2 text-justify">
-                {barbershop.name}
-                <MaterialIcons name="verified" size={18} color="white" />
-              </Text>
-              <View>
-                {barbershop.operational_hours.length > 0 ? (
-                  barbershop.operational_hours.map((hour, index) => (
-                    <Text key={index} className="text-white text-sm">
-                      {toTitleCase(hour.day)}:{" "}
-                      {hour.opening_time.substring(0, 5)} -{" "}
-                      {hour.closing_time.substring(0, 5)}
-                    </Text>
-                  ))
-                ) : (
-                  <Text className="text-white text-sm">Closed</Text>
-                )}
-              </View>
-            </View>
-          </View>
 
-          {/* Service Selection */}
-          <View className="p-4 bg-zinc-200">
-            <Text className="text-xl font-bold text-zinc-800 mb-2">
-              Select Service
-            </Text>
-            <View className="mb-4">
-              {radioButtons.map((service) => (
-                <TouchableOpacity
-                  key={service.id}
-                  onPress={() => handleServiceChange(service.id)}
-                  className={`p-4 mb-2 border rounded-md ${
-                    selectedServiceId === service.id
-                      ? "bg-zinc-300 border-zinc-600"
-                      : "bg-white border-zinc-400"
-                  }`}
-                >
-                  <Text className="text-lg font-semibold text-zinc-800">
-                    {service.label}
-                  </Text>
-                  <Text className="text-base text-zinc-600">
-                    {formatPrice(service.price)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            {/* Booking Details */}
-            <Text className="text-xl font-bold text-zinc-800 mb-2">
-              Booking Details
-            </Text>
-            <TouchableOpacity
-              onPress={showDatepicker}
-              className="p-4 mb-2 bg-white border rounded-md border-zinc-400"
-            >
-              <Text className="text-lg text-zinc-800">
-                Date: {formattedDate}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={showTimepicker}
-              className="p-4 mb-2 bg-white border rounded-md border-zinc-400"
-            >
-              <Text className="text-lg text-zinc-800">
-                Time: {selectedTime}
-              </Text>
-            </TouchableOpacity>
-
-            {/* Total Payment */}
-            <Text className="text-xl font-bold text-zinc-800 mt-4">
-              Total Payment
-            </Text>
-            <View className="mt-2 p-4 bg-white border rounded-md border-zinc-400 mb-16">
-              <Text className="text-xl text-zinc-800">
-                {formatPrice(totalPayment)}
-              </Text>
-            </View>
-          </View>
-        </ScrollView>
-      </View>
-
-      {/* Booking Button */}
-      <TouchableOpacity
-        className="absolute bottom-0 left-0 right-0 bg-zinc-100 p-4 border border-zinc-950"
-        onPress={saveBookingData}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
-        <Text className="text-zinc-900 font-bold text-center text-lg">
-          Continue
-        </Text>
-      </TouchableOpacity>
+        {/* Barbershop Info */}
+        <View className="flex-col items-center justify-center border-2 border-zinc-200 rounded-3xl px-6 py-4 my-2">
+          <Text className="text-lg font-bold">
+            {barbershop.name}
+            <MaterialIcons name="verified" size={18} color="black" />
+          </Text>
+          <View>
+            {barbershop.operational_hours.length > 0 ? (
+              barbershop.operational_hours.map((hour, index) => (
+                <Text key={index} className="text-sm text-center">
+                  {toTitleCase(hour.day)}: {hour.opening_time.substring(0, 5)} -{" "}
+                  {hour.closing_time.substring(0, 5)}
+                </Text>
+              ))
+            ) : (
+              <Text className="font-extrabold bg-zinc-200 p-2 rounded-lg text-center">
+                Closed
+              </Text>
+            )}
+          </View>
+        </View>
+
+        {/* Service Selection */}
+        <View className="flex-col items-center justify-center border-2 border-zinc-200 rounded-3xl p-2 my-2">
+          <Text className="font-extrabold bg-zinc-200 p-2 rounded-3xl text-center w-full">
+            Select Service
+          </Text>
+          <View className="mt-4 w-full">
+            {radioButtons.map((service) => (
+              <TouchableOpacity
+                key={service.id}
+                onPress={() => handleServiceChange(service.id)}
+                className={`py-2 items-center border-2 border-zinc-200 rounded-3xl ${
+                  selectedServiceId === service.id ? "bg-zinc-200" : ""
+                }`}
+              >
+                <Text className="font-extrabold">{service.label}</Text>
+                <Text>{formatPrice(service.price)}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Booking Details */}
+        <View className="flex-col items-center justify-center border-2 border-zinc-200 rounded-3xl p-2 my-2">
+          <Text className="font-extrabold bg-zinc-200 p-2 rounded-3xl text-center w-full">
+            Booking Date
+          </Text>
+          <TouchableOpacity
+            onPress={showDatepicker}
+            className="flex-row justify-between py-2 px-4 items-center border-2 border-zinc-200 rounded-3xl w-full mt-2"
+          >
+            <Text className="font-bold">Select Date: {formattedDate}</Text>
+            <Fontisto name="date" size={18} color="black" />
+          </TouchableOpacity>
+          <View className="flex-row justify-between py-2 px-4 items-center border-2 border-zinc-200 rounded-3xl w-full mt-2">
+            <Text className="font-bold">Select Time: </Text>
+            <Picker
+              selectedValue={selectedTime}
+              onValueChange={handleTimeChange}
+              style={{ flex: 1 }}
+              dropdownIconColor="black"
+            >
+              <Picker.Item label="Select Time" value={null} />
+              {generateTimeOptions().map((time) => (
+                <Picker.Item key={time} label={time} value={time} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
+        {/* Total Payment */}
+        <View className="flex-col items-center justify-center border-2 border-zinc-200 rounded-3xl p-2 my-2">
+          <Text className="font-extrabold bg-zinc-200 p-2 rounded-3xl text-center w-full">
+            Total Payment
+          </Text>
+          <View className="py-2 items-center bg-zinc-600  rounded-3xl mt-4 w-full">
+            <Text className="text-xl text-zinc-100 font-extrabold">
+              {formatPrice(totalPayment)}
+            </Text>
+          </View>
+        </View>
+
+        {/* Booking Button */}
+        <TouchableOpacity
+          className="w-full bg-zinc-800 rounded-full py-2 my-4"
+          onPress={saveBookingData}
+        >
+          <Text className="text-zinc-200 font-bold text-center text-xl">
+            Continue
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
     </SafeAreaView>
   );
 }
