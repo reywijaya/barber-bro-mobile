@@ -95,128 +95,58 @@ export const ReviewScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-zinc-200">
+    <SafeAreaView className="flex flex-col p-8 min-h-screen">
       {/* Back Button and Header */}
-      <View className="flex-row items-center p-2 bg-white border border-solid border-black">
+      <View className="flex-row items-center">
         <Ionicons
           name="arrow-back"
           size={24}
           color="#030712"
           onPress={() => navigation.goBack()}
         />
-        <Text className="text-zinc-900 text-xl font-bold ml-2">Back</Text>
+        <Text className="text-lg font-bold text-center w-2/3">Review Your Booking</Text>
       </View>
 
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 80 }}>
-        {/* Main Content */}
-        <View className="bg-white mt-2 mx-2 p-4 rounded-md shadow-md">
-          {/* Booking Information */}
-          <View className="bg-zinc-700 p-4 rounded-md mb-4">
-            <View className="flex-row gap-4 items-center mb-4">
-              <UserAvatar
-                size={50}
-                name={`${userData.firstName} ${userData.surname}`}
-                src={userData.avatar}
-              />
-              <View className="flex-col justify-center">
-                <Text className="font-bold text-zinc-400 text-sm">
-                  {userData.firstName} {userData.surname}
-                </Text>
-                {dataBooking.services.map((item) => (
-                  <Text className="text-zinc-400 text-xs" key={item.id}>
-                    {item.name}
-                  </Text>
-                ))}
-              </View>
-            </View>
+      {/* Main Content */}
+      <View className="border-2 border-zinc-200 my-8 p-2 rounded-3xl">
+        <Text className="font-extrabold bg-zinc-200 p-2 rounded-3xl text-center w-full">
+          Booking Details
+        </Text>
+        {/* Booking Details */}
+        <View className="mt-2 px-2">
+          <View className="flex-row justify-between">
+            <Text className="font-bold">Date</Text>
+            <Text className="font-bold">
+              {dataBooking.booking_date} at {dataBooking.booking_time}
+            </Text>
+          </View>
 
-            {/* Booking Details */}
-            <View className="border-b border-zinc-600 pb-2 mb-4">
-              <View className="flex-row justify-between mb-3">
-                <Text className="text-zinc-400">Date</Text>
-                <Text className="text-zinc-400 text-xs">
-                  {dataBooking.booking_date} at {dataBooking.booking_time}
-                </Text>
-              </View>
-
-              <View className="flex-row justify-between mb-1">
-                <Text className="text-zinc-400 text-md">Service</Text>
-              </View>
-
-              {dataBooking.services.map((item) => (
-                <View className="flex-row justify-between my-1" key={item.id}>
-                  <Text className="text-zinc-400 text-xs">{item.name}</Text>
-                  <Text className="text-zinc-400 text-xs">
-                    {formatPrice(item.price)}
-                  </Text>
-                </View>
-              ))}
-            </View>
-
-            <View className="flex-row justify-between">
-              <Text className="text-zinc-400">Total Payment</Text>
-              <Text className="text-zinc-400 text-xs">
-                {formatPrice(dataBooking.totalPayment)}
+          <Text className="mt-2">Choosen Service:</Text>
+          {dataBooking.services.map((item) => (
+            <View className="flex-row justify-between" key={item.id}>
+              <Text className="font-bold">{item.name}</Text>
+              <Text className="font-bold">
+                {formatPrice(item.price)}
               </Text>
             </View>
-          </View>
+          ))}
 
-          {/* Barbershop Information */}
-          <View className="bg-zinc-700 p-4 rounded-md mb-4">
-            <View className="flex-row gap-4 items-center mb-4">
-              <Image
-                source={{
-                  uri:
-                    "http://10.10.102.48:8085" +
-                    dataBooking.barbershop.barbershop_profile_picture_id.path,
-                }}
-                className="w-12 h-12 rounded-md"
-                resizeMode="cover"
-              />
-              <View className="flex-col">
-                <Text className="font-bold text-zinc-400 text-sm">
-                  {dataBooking.barbershop.name}
-                  <MaterialIcons name="verified" size={18} color="white" />
-                </Text>
-                {dataBooking.barbershop.operational_hours.map((item) => (
-                  <View className="flex-row" key={item.id}>
-                    <Text className="text-zinc-400 text-xs">
-                      {toTitleCase(item.day)}, {item.opening_time} -{" "}
-                      {item.closing_time}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-
-            {/* Get Directions Button */}
-            <TouchableOpacity
-              className="flex-row items-center bg-zinc-600 p-2 rounded-md mb-4"
-              onPress={() =>
-                navigation.navigate("Maps", {
-                  latitude: dataBooking.barbershop.latitude,
-                  longitude: dataBooking.barbershop.longitude,
-                  markerTitle: dataBooking.barbershop.name,
-                })
-              }
-            >
-              <MaterialCommunityIcons
-                color={"#d1d5db"}
-                name="map-marker"
-                size={20}
-              />
-              <Text className="text-zinc-400 text-sm ml-2">Get direction</Text>
-            </TouchableOpacity>
+          <View className="h-[1px] w-full bg-zinc-300 my-2"></View>
+          <View className="flex-row justify-between">
+            <Text className="font-extrabold text-lg">Total Payment</Text>
+            <Text className="font-extrabold text-lg">
+              {formatPrice(dataBooking.totalPayment)}
+            </Text>
           </View>
         </View>
-      </ScrollView>
+      </View>
 
       {/* Booking Button */}
       <TouchableOpacity
-        className="bg-white w-full p-4 items-center justify-center absolute bottom-0 right-0 left-0 border-t border-zinc-300"
+        className="bg-zinc-800 w-full py-3 items-center justify-center rounded-full"
         onPress={() => setModalVisible(true)}
       >
-        <Text className="text-zinc-900 font-bold text-base">Booking Now</Text>
+        <Text className="text-zinc-200 font-bold text-lg">Proceed Booking</Text>
       </TouchableOpacity>
 
       {/* Confirmation Modal */}
@@ -226,25 +156,28 @@ export const ReviewScreen = ({ navigation }) => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View className="flex-1 justify-center items-center bg-opacity-50">
-          <View className="bg-zinc-200 p-4 rounded-md w-80">
+        <View className="flex-1 justify-center items-center">
+          <View className="bg-zinc-200 p-4 rounded-3xl w-80 items-center">
             <Text className="text-lg font-bold mb-4">Confirm Booking</Text>
-            <Text className="mb-4">
+            <Text className="mb-4 text-center">
               Are you sure you want to book this appointment?
             </Text>
-            <View className="flex-row justify-between">
-              <Button
-                title="Cancel"
+            <View className="flex-row justify-around w-full">
+              <TouchableOpacity
                 onPress={() => setModalVisible(false)}
-                color={"red"}
-              />
-              <Button
-                title="Confirm"
+                className="bg-red-200 rounded-3xl w-1/3 py-2 justify-center items-center"
+              >
+                <Text className="text-red-700 font-bold">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="bg-blue-200 rounded-3xl w-1/3 py-2 justify-center items-center"
                 onPress={() => {
                   handleBooking();
                   setModalVisible(false);
                 }}
-              />
+              >
+                <Text className="text-blue-700 font-bold">Confirm</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
