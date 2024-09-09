@@ -6,14 +6,11 @@ import {
   TouchableOpacity,
   Image,
   RefreshControl,
-  ImageBackground,
-  Alert,
   TextInput,
 } from "react-native";
-import { SearchBar } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-import { AntDesign, Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getBarbershop } from "../service/fetchDataBarberShop";
 import { getBarbershops } from "../store/barbershops";
@@ -40,8 +37,12 @@ const sortByRating = (data, order) => {
 
 const sortBarbershopData = (data, sortDistance, sortRating) => {
   let sortedData = [...data];
-  if (sortDistance) sortedData = sortByDistance(sortedData, sortDistance);
-  if (sortRating) sortedData = sortByRating(sortedData, sortRating);
+  if (sortDistance) {
+    sortedData = sortByDistance(sortedData, sortDistance);
+  } else if (sortRating) {
+    sortedData = sortByRating(sortedData, sortRating);
+  }
+
   return sortedData;
 };
 
@@ -73,6 +74,7 @@ const HomeScreen = ({ navigation }) => {
       console.error("Error fetching barbershop data:", error);
     }
   };
+
   const loadUserData = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -255,7 +257,7 @@ const HomeScreen = ({ navigation }) => {
                     <View className="flex-row items-center gap-x-2">
                       <Feather name="map-pin" size={14} color="black" />
                       <Text className="text-xs font-bold">
-                        {item.distance_km.toFixed(1)} km
+                        {item.distance_km.toFixed(2)} km
                       </Text>
                     </View>
                   </View>
