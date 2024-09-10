@@ -41,19 +41,32 @@ const formatPrice = (price) => {
   }).format(price);
 };
 
+const formatDate = (dateString) => {
+  // Split the date string by '/'
+  const [day, month, year] = dateString.split("/").map(Number);
+
+  
+  const formattedMonth = month.toString().padStart(2, "0");
+  const formattedDay = day.toString().padStart(2, "0");
+
+  // Create a new Date object with the formatted date
+  const formattedDate = new Date(`${year}-${formattedMonth}-${formattedDay}`);
+
+  return formattedDate;
+};
 export const ReviewScreen = ({ navigation }) => {
   const userData = useSelector((state) => state.profileData.profileData);
   const user = useSelector((state) => state.user.loggedInUser);
-  console.log("user", user);
+  // console.log("user", user);
   const dataBooking = useSelector((state) => state.appointment.appointments);
-
-
   const [modalVisible, setModalVisible] = useState(false);
   // console.log(dataBooking.booking_date, dataBooking.booking_time);
-  const [day, month, year] = dataBooking.booking_date.split("/").map(Number);
-  // console.log(day, month, year);
-  const formattedDate = new Date(year, month - 1, day);
-  const formattedTime = moment(dataBooking.booking_time, 'HH:mm').format('HH:mm');
+
+  const formattedDate = formatDate(dataBooking.booking_date);
+  // console.log("formattedDate", formattedDate);
+  const formattedTime = moment(dataBooking.booking_time, "HH:mm").format(
+    "HH:mm"
+  );
 
   const idServices = dataBooking.services.map((service) => service.id);
   const bookingValues = {
@@ -62,7 +75,7 @@ export const ReviewScreen = ({ navigation }) => {
     booking_date: formattedDate.getTime(),
     booking_time: formattedTime,
   };
-  console.log("bookingValues", bookingValues);
+  // console.log("bookingValues", bookingValues);
 
   const handleBooking = async () => {
     try {
@@ -106,7 +119,9 @@ export const ReviewScreen = ({ navigation }) => {
           color="#030712"
           onPress={() => navigation.goBack()}
         />
-        <Text className="text-lg font-bold text-center w-2/3">Review Your Booking</Text>
+        <Text className="text-lg font-bold text-center w-2/3">
+          Review Your Booking
+        </Text>
       </View>
 
       {/* Main Content */}
@@ -127,9 +142,7 @@ export const ReviewScreen = ({ navigation }) => {
           {dataBooking.services.map((item) => (
             <View className="flex-row justify-between" key={item.id}>
               <Text className="font-bold">{item.name}</Text>
-              <Text className="font-bold">
-                {formatPrice(item.price)}
-              </Text>
+              <Text className="font-bold">{formatPrice(item.price)}</Text>
             </View>
           ))}
 

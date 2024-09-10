@@ -66,7 +66,7 @@ const HistoryScreen = ({ navigation }) => {
     return listBooking.filter((booking) => booking.status === selectedStatus);
   }, [selectedStatus, listBooking]);
 
-  // console.log(filteredBookings)
+  console.log(filteredBookings)
   const colorStatus = (status) => {
     switch (status) {
       case "Pending":
@@ -79,7 +79,9 @@ const HistoryScreen = ({ navigation }) => {
         return "text-zinc-900 bg-zinc-300";
     }
   };
-
+  const formatedDate = (date) => {
+    return moment(date).format("DD MMM YYYY");
+  };
   return (
     <SafeAreaView>
       <ScrollView
@@ -157,9 +159,7 @@ const HistoryScreen = ({ navigation }) => {
                       <Text className="ml-1 text-xs">Booking Date</Text>
                     </View>
                     <Text className="text-zinc-900 text-sm">
-                      {moment(booking.bookingDate).format(
-                        "MMMM Do YYYY, HH:mm"
-                      )}
+                      {formatedDate(booking.booking_date)} {booking.booking_time}
                     </Text>
 
                     {booking.services.map((service) => (

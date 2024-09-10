@@ -46,7 +46,7 @@ export default function EditProfileScreen({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    if (!firstName || !surname || !phone || !address || !about) {
+    if (!firstName || !surname || !phone || !address ) {
       Alert.alert("Error", "All fields are required.");
       return;
     }
@@ -60,7 +60,7 @@ export default function EditProfileScreen({ navigation }) {
       surname,
       phone,
       address,
-      about,
+      //about,
       is_male: isMale,
       date_of_birth: dateOfBirth.getTime(),
     };

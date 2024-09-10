@@ -16,6 +16,7 @@ import { Fontisto, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { Picker } from "@react-native-picker/picker";
 import axiosInstance from "../service/axios";
+import { convertDateToLong, convertToDate } from "../hooks/convertDate";
 
 const formatPrice = (price) => {
   return new Intl.NumberFormat("id-ID", {
@@ -85,15 +86,6 @@ const isWithinRange = (
   return selectedTime >= openingTime && selectedTime <= closingTime;
 };
 
-function convertDateToMillis(dateString) {
-  const dateParts = dateString.split("/");
-  const day = parseInt(dateParts[0], 10);
-  const month = parseInt(dateParts[1], 10) - 1;
-  const year = parseInt(dateParts[2], 10);
-  const date = new Date(year, month, day);
-  const millis = date.getTime();
-  return millis;
-}
 
 export default function AppointmentScreen({ route, navigation }) {
   const { barbershop } = route.params;
@@ -102,14 +94,16 @@ export default function AppointmentScreen({ route, navigation }) {
   const [totalPayment, setTotalPayment] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [date, setDate] = useState(new Date());
+  // console.log("date", date);
   const [formattedDate, setFormattedDate] = useState(date.toLocaleDateString());
-  const convertDate = convertDateToMillis(formattedDate);
+  console.log("formattedDate", formattedDate);
+  const convertDate = convertDateToLong(date);
   console.log("convertDate", convertDate);
   const [selectedTime, setSelectedTime] = useState(null);
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user.loggedInUser);
-  console.log("userData.token", userData.token);
-  const [availableTimes, setAvailableTimes] = useState(null);
+  // console.log("userData.token", userData.token);
+  const [availableTimes, setAvailableTimes] = useState([]);
   console.log("availableTimes", availableTimes);
   const fetchAvailableTimes = async () => {
     try {
@@ -127,6 +121,7 @@ export default function AppointmentScreen({ route, navigation }) {
         "Failed to fetch available times:",
         error.response.data.message
       );
+      setAvailableTimes([]);
     }
   };
 
@@ -201,7 +196,7 @@ export default function AppointmentScreen({ route, navigation }) {
 
   const handleTimeChange = (itemValue) => {
     if (
-      availableTimes?.available_time.includes(itemValue) &&
+      availableTimes.available_time.includes(itemValue) &&
       validateTime(itemValue, barbershop.operational_hours)
     ) {
       setSelectedTime(itemValue);
@@ -216,7 +211,7 @@ export default function AppointmentScreen({ route, navigation }) {
   };
 
   const generateTimeOptions = () => {
-    return availableTimes?.available_time || [];
+    return availableTimes.available_time || ["No Available Times"];
   };
 
   const saveBookingData = async () => {
@@ -245,6 +240,15 @@ export default function AppointmentScreen({ route, navigation }) {
         title: "Error",
         type: ALERT_TYPE.DANGER,
         textBody: `Time ${selectedTime} is not within operational hours barbershop.`,
+        autoClose: 2000,
+      });
+      return;
+    }
+    if (availableTimes.length === 0) {
+      Toast.show({
+        title: "Error",
+        type: ALERT_TYPE.DANGER,
+        textBody: "No available times for booking on this date.",
         autoClose: 2000,
       });
       return;

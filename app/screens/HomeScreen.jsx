@@ -59,7 +59,7 @@ const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser);
-  // console.log(user);
+  console.log("user:", user);
   const [dataNearbyBarbershop, setDataNearbyBarbershop] = useState([]);
   const [sortDistance, setSortDistance] = useState("");
   const [sortRating, setSortRating] = useState("");
